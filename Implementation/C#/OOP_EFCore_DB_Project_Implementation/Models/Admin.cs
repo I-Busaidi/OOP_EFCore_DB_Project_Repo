@@ -32,6 +32,8 @@ namespace OOP_EFCore_DB_Project_Implementation.Models
         [ForeignKey("MasterAdmin")]
         public int? MasterAdminId { get; set; }
         public virtual Admin MasterAdmin { get; set; }
+
+        [InverseProperty("MasterAdmin")]
         public List<Admin>? ManagedAdmins { get; set; }
     }
 }
