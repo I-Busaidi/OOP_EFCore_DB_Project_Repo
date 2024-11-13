@@ -27,8 +27,15 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
 
         public void Insert(User user)
         {
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            try
+            {
+                _context.Users.Add(user);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message.ToString());
+            }
         }
 
         public void UpdateByName(User user, string fname, string lname)
@@ -36,8 +43,15 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var userToUpdate = GetByName(fname, lname);
             if (userToUpdate != null)
             {
-                _context.Users.Entry(userToUpdate).CurrentValues.SetValues(user);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Users.Entry(userToUpdate).CurrentValues.SetValues(user);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
             }
         }
 
@@ -46,8 +60,15 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var user = _context.Users.Find(uId);
             if (user != null)
             {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Users.Remove(user);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
             }
         }
 

@@ -19,23 +19,37 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         {
             return _context.Admins.ToList();
         }
-        public Admin GetByName(string firstName, string lastName)
+        public Admin GetByName(string firstName, string? lastName)
         {
             return _context.Admins.FirstOrDefault(a => a.AdminFname == firstName
-                                                        && a.AdminLname == lastName);
+                                                    && a.AdminLname == lastName);
         }
         public void Insert(Admin admin)
         {
-            _context.Admins.Add(admin);
-            _context.SaveChanges();
+            try
+            {
+                _context.Admins.Add(admin);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message.ToString());
+            }
         }
-        public void UpdateByName(Admin admin, string firstName, string lastName)
+        public void UpdateByName(Admin admin, string firstName, string? lastName)
         {
             var adminToUpdate = GetByName(firstName, lastName);
             if (adminToUpdate != null)
             {
-                _context.Admins.Entry(adminToUpdate).CurrentValues.SetValues(admin);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Admins.Entry(adminToUpdate).CurrentValues.SetValues(admin);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
             }
         }
         public void DeleteById(int id)
@@ -43,8 +57,15 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var admin = _context.Admins.Find(id);
             if (admin != null)
             {
-                _context.Admins.Remove(admin);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Admins.Remove(admin);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ using OOP_EFCore_DB_Project_Implementation.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,8 +58,15 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
 
         public void Insert(Borrow borrow)
         {
-            _context.Borrows.Add(borrow);
-            _context.SaveChanges();
+            try
+            {
+                _context.Borrows.Add(borrow);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         public void UpdateById(Borrow borrow, int id)
@@ -66,8 +74,15 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var borrowToUpdate = GetById(id);
             if (borrowToUpdate != null)
             {
-                _context.Borrows.Entry(borrowToUpdate).CurrentValues.SetValues(borrow);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Borrows.Entry(borrowToUpdate).CurrentValues.SetValues(borrow);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
 
@@ -76,8 +91,15 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var borrow = GetById(id);
             if(borrow != null)
             {
-                _context.Borrows.Remove(borrow);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Borrows.Remove(borrow);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
     }

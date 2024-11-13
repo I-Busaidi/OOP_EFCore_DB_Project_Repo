@@ -25,16 +25,30 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         }
         public void Insert(Book book)
         {
-            _context.Books.Add(book);
-            _context.SaveChanges();
+            try
+            {
+                _context.Books.Add(book);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
         public void UpdateByName(Book book, string name)
         {
             var bookToUpdate = GetByName(name);
             if (bookToUpdate != null)
             {
-                _context.Books.Entry(bookToUpdate).CurrentValues.SetValues(book);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Books.Entry(bookToUpdate).CurrentValues.SetValues(book);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
         public void DeleteById(int id)
@@ -42,8 +56,15 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var book = _context.Books.Find(id);
             if (book != null)
             {
-                _context.Books.Remove(book);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Books.Remove(book);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
         public decimal GetTotalPrice()

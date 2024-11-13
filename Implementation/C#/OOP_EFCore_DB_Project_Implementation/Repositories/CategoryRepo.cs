@@ -24,16 +24,30 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         }
         public void Insert(Category category)
         {
-            _context.Categories.Add(category);
-            _context.SaveChanges();
+            try
+            {
+                _context.Categories.Add(category);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
         public void UpdateByName(Category category, string name)
         {
             var categoryToUpdate = GetByName(name);
             if (categoryToUpdate != null)
             {
-                _context.Categories.Entry(categoryToUpdate).CurrentValues.SetValues(category);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Categories.Entry(categoryToUpdate).CurrentValues.SetValues(category);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
             }
         }
         public void DeleteById(int id)
@@ -41,8 +55,15 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var category = _context.Categories.Find(id);
             if (category != null)
             {
-                _context.Categories.Remove(category);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Categories.Remove(category);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
     }
