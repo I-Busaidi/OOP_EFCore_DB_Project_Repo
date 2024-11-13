@@ -36,7 +36,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var userToUpdate = GetByName(fname, lname);
             if (userToUpdate != null)
             {
-                _context.Entry(userToUpdate).CurrentValues.SetValues(user);
+                _context.Users.Entry(userToUpdate).CurrentValues.SetValues(user);
                 _context.SaveChanges();
             }
         }

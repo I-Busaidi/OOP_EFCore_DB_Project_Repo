@@ -33,7 +33,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var bookToUpdate = GetByName(name);
             if (bookToUpdate != null)
             {
-                _context.Entry(bookToUpdate).CurrentValues.SetValues(book);
+                _context.Books.Entry(bookToUpdate).CurrentValues.SetValues(book);
                 _context.SaveChanges();
             }
         }

@@ -34,7 +34,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             var adminToUpdate = GetByName(firstName, lastName);
             if (adminToUpdate != null)
             {
-                _context.Entry(adminToUpdate).CurrentValues.SetValues(admin);
+                _context.Admins.Entry(adminToUpdate).CurrentValues.SetValues(admin);
                 _context.SaveChanges();
             }
         }
