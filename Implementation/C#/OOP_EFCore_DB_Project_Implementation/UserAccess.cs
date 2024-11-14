@@ -28,9 +28,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             userRepo.Insert(user);
         }
 
-        public User LoginUser(string passcode)
+        public User LoginUser(string userEmail, string passcode)
         {
-            return userRepo.GetAll().FirstOrDefault(u => u.Passcode == passcode);
+            return userRepo.GetAll().FirstOrDefault(u => u.Passcode == passcode && u.Email == userEmail);
         }
 
         public IEnumerable<Book> ViewAllBooks()
@@ -53,7 +53,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                     BookId = bookId,
                     UserId = userId,
                     BorrowDate = DateTime.Now,
-                    ReturnDate = DateTime.Now.AddDays(14),
+                    ReturnDate = DateTime.Now.AddDays(book.BorrowPeriod),
                     IsReturned = false
                 });
                 book.BorrowedCopies++;
