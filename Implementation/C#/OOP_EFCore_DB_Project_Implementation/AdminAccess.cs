@@ -41,7 +41,31 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         public void RegisterAdmin(Admin admin)
         {
-            adminRepo.Insert(admin);
+            if (adminRepo.GetByEmail(admin.AdminEmail) == null)
+            {
+                adminRepo.Insert(admin);
+            }
+            else
+            {
+                Console.WriteLine("Admin email already exists.");
+            }
+        }
+
+        public void RemoveAdmin(int id)
+        {
+            adminRepo.DeleteById(id);
+        }
+
+        public void UpdateAdmin(Admin admin)
+        {
+            if (adminRepo.GetByEmail(admin.AdminEmail) == null || adminRepo.GetById(admin.AdminId).AdminEmail == admin.AdminEmail)
+            {
+                adminRepo.UpdateByName(admin, admin.AdminFname, admin.AdminLname);
+            }
+            else
+            {
+                Console.WriteLine("admin with this email already exists.");
+            }
         }
 
         public Admin LoginAdmin(string email, string password)
@@ -51,22 +75,107 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         public void AddBook(Book book)
         {
-            bookRepo.Insert(book);
+            if (bookRepo.GetByName(book.BookName) == null)
+            {
+                bookRepo.Insert(book);
+                var category = categoryRepo.GetByName(book.Category.CatName);
+                if (category != null)
+                {
+                    category.NumOfBooks++;
+                    categoryRepo.UpdateByName(category, category.CatName);
+                }
+            }
+            else
+            {
+                Console.WriteLine("A book with this name already exists.");
+            }
         }
 
         public void UpdateBook(string name, Book book)
         {
-            if (!borrowRepo.GetAll().Any(b => b.BookId == book.BookId && b.IsReturned == false))
+            bookRepo.UpdateByName(book, name);
+        }
+
+        public void DeleteBook(string name)
+        {
+            var book = bookRepo.GetByName(name);
+            if (book != null && !bookRepo.IsBookBorrowed(book.BookId))
             {
-                bookRepo.UpdateByName(book, name);
+                var category = categoryRepo.GetByName(book.Category.CatName);
+                bookRepo.DeleteById(book.BookId);
+                if (category != null)
+                {
+                    category.NumOfBooks--;
+                    categoryRepo.UpdateByName(category, category.CatName);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Book not found or currently borrowed.");
             }
         }
 
-        public void DeleteBook(int id)
+        public void AddCategory(Category category)
         {
-            if (!borrowRepo.GetAll().Any(b => b.BookId == id && b.IsReturned == false))
+            categoryRepo.Insert(category);
+        }
+
+        public void UpdateCategory(string catName)
+        {
+            var category = categoryRepo.GetByName(catName);
+            if (category != null)
             {
-                bookRepo.DeleteById(id);
+                categoryRepo.UpdateByName(category, catName);
+            }
+        }
+
+        public void DeleteCategory(string catName)
+        {
+            var category = categoryRepo.GetByName(catName);
+            if (category != null && !category.Books.Any())
+            {
+                categoryRepo.DeleteById(category.CatId);
+            }
+            else
+            {
+                Console.WriteLine("Category has books or not found.");
+            }
+        }
+
+        public void AddUser(User user)
+        {
+            if (userRepo.GetByEmail(user.Email) == null)
+            {
+                userRepo.Insert(user);
+            }
+            else
+            {
+                Console.WriteLine("Email is already in use.");
+            }
+        }
+
+        public void RemoveUser(int uId)
+        {
+            var user = userRepo.GetById(uId);
+            if (user != null && !user.Borrows.Any(b => !b.IsReturned))
+            {
+                userRepo.DeleteById(uId);
+            }
+            else
+            {
+                Console.WriteLine("User not found, or has pending returns.");
+            }
+        }
+
+        public void EditUser(User user)
+        {
+            if (userRepo.GetByEmail(user.Email) == null || userRepo.GetById(user.UserId).Email == user.Email)
+            {
+                userRepo.UpdateByName(user, user.FName, user.LName);
+            }
+            else
+            {
+                Console.WriteLine("This user email is already in use.");
             }
         }
 

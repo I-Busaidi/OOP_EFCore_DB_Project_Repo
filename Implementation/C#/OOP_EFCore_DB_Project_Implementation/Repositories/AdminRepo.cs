@@ -24,6 +24,17 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             return _context.Admins.FirstOrDefault(a => a.AdminFname == firstName
                                                     && a.AdminLname == lastName);
         }
+
+        public Admin GetByEmail(string email)
+        {
+            return _context.Admins.FirstOrDefault(a => a.AdminEmail == email);
+        }
+
+        public Admin GetById(int id)
+        {
+            return _context.Admins.Find(id);
+        }
+
         public void Insert(Admin admin)
         {
             try

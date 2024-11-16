@@ -10,6 +10,8 @@ namespace OOP_EFCore_DB_Project_Implementation
     {
         IEnumerable<T> GetAll();
         T GetByName(string fname, string lname);
+        T GetByEmail(string email);
+        T GetById(int id);
         void Insert(T entity);
         void UpdateByName(T entity, string fname, string lname);
         void DeleteById(int id);

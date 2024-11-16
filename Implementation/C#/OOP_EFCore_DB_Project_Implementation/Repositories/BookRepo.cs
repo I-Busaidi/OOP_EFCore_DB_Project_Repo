@@ -83,5 +83,10 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         {
             return _context.Books.Count(book => book.Category.CatName == name);
         }
+
+        public bool IsBookBorrowed(int id)
+        {
+            return _context.Borrows.Any(b => b.BookId == id && !b.IsReturned);
+        }
     }
 }

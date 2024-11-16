@@ -1,4 +1,5 @@
-﻿using OOP_EFCore_DB_Project_Implementation.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using OOP_EFCore_DB_Project_Implementation.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,16 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         public User GetByName(string fname, string lname)
         {
             return _context.Users.FirstOrDefault(u => u.FName == fname && u.LName == lname);
+        }
+
+        public User GetByEmail(string email)
+        {
+            return _context.Users.Include(b => b.Borrows).FirstOrDefault(u => u.Email == email);
+        }
+
+        public User GetById(int id)
+        {
+            return _context.Users.Find(id);
         }
 
         public void Insert(User user)
