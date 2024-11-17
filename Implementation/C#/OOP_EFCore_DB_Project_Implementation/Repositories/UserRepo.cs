@@ -33,7 +33,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
 
         public User GetById(int id)
         {
-            return _context.Users.Find(id);
+            return _context.Users.Include(b => b.Borrows).Where(u => u.UserId == id).FirstOrDefault();
         }
 
         public void Insert(User user)

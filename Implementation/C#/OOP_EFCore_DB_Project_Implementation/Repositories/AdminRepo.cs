@@ -27,7 +27,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
 
         public Admin GetByEmail(string email)
         {
-            return _context.Admins.FirstOrDefault(a => a.AdminEmail == email);
+            return _context.Admins.FirstOrDefault(a => a.AdminEmail.ToLower() == email.ToLower());
         }
 
         public Admin GetById(int id)

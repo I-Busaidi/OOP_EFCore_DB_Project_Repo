@@ -33,27 +33,21 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         private static void ShowLoginMenu()
         {
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine("Select an option to login:");
-                Console.WriteLine("1. Admin Login");
-                Console.WriteLine("2. User Login");
-                Console.WriteLine("3. Exit");
+            string header = "Select an option to login:";
+            string[] loginOptions = { "Admin Login", "User Login", "Exit" };
+            int choice = ArrowKeySelection(loginOptions.ToList(), header);
 
-                var key = Console.ReadKey();
-                if (key.Key == ConsoleKey.D1 || key.Key == ConsoleKey.NumPad1)
-                {
-                    AdminLogin();
-                }
-                else if (key.Key == ConsoleKey.D2 || key.Key == ConsoleKey.NumPad2)
-                {
-                    UserLogin();
-                }
-                else if (key.Key == ConsoleKey.D3 || key.Key == ConsoleKey.NumPad3)
-                {
-                    Environment.Exit(0);
-                }
+            if (choice == 0)
+            {
+                AdminLogin();
+            }
+            else if (choice == 1)
+            {
+                UserLogin();
+            }
+            else if (choice == 2)
+            {
+                return;
             }
         }
 
@@ -106,109 +100,99 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         private static void ShowAdminMenu(Admin admin)
         {
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine("Admin Menu:");
-                Console.WriteLine("1. Add Book");
-                Console.WriteLine("2. View All Books");
-                Console.WriteLine("3. View Users");
-                Console.WriteLine("4. Manage Categories");
-                Console.WriteLine("5. Search for Books");
-                Console.WriteLine("6. Logout");
+            string header = "Admin Menu:";
+            string[] options = { "Add Book", "View All Books", "View Users", "Manage Categories", "Search for Books", "Logout" };
 
-                var key = Console.ReadKey();
-                if (key.Key == ConsoleKey.D1 || key.Key == ConsoleKey.NumPad1)
-                {
-                    AddBookMenu();
-                }
-                else if (key.Key == ConsoleKey.D2 || key.Key == ConsoleKey.NumPad2)
-                {
-                    ViewAllBooks();
-                }
-                else if (key.Key == ConsoleKey.D3 || key.Key == ConsoleKey.NumPad3)
-                {
-                    ViewAllUsers();
-                }
-                else if (key.Key == ConsoleKey.D4 || key.Key == ConsoleKey.NumPad4)
-                {
-                    ManageCategories();
-                }
-                else if (key.Key == ConsoleKey.D5 || key.Key == ConsoleKey.NumPad5)
-                {
-                    SearchBooksMenu();
-                }
-                else if (key.Key == ConsoleKey.D6 || key.Key == ConsoleKey.NumPad6)
-                {
-                    Logout();
-                    return;
-                }
+            int choice = ArrowKeySelection(options.ToList(), header);
+            if (choice == 0)
+            {
+                AddBookMenu();
             }
+            else if (choice == 1)
+            {
+                ViewAllBooks();
+            }
+            else if (choice == 2)
+            {
+                ViewAllUsers();
+            }
+            else if (choice == 3)
+            {
+                ManageCategories();
+            }
+            else if (choice == 4)
+            {
+                SearchBooksMenu();
+            }
+            else if (choice == 5)
+            {
+                Logout();
+                return;
+            }
+
         }
 
         private static void ShowUserMenu(User user)
         {
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine("User Menu:");
-                Console.WriteLine("1. Browse Books");
-                Console.WriteLine("2. Search for Books");
-                Console.WriteLine("3. View Borrowed Books");
-                Console.WriteLine("4. Edit User Info");
-                Console.WriteLine("5. Logout");
+            string header = "User Menu:";
+            string[] options = {"Browse Books", "Search for Books", "View Borrowed Books", "Edit User Info", "Logout"};
 
-                var key = Console.ReadKey();
-                if (key.Key == ConsoleKey.D1 || key.Key == ConsoleKey.NumPad1)
-                {
-                    BrowseBooks();
-                }
-                else if (key.Key == ConsoleKey.D2 || key.Key == ConsoleKey.NumPad2)
-                {
-                    SearchBooksMenu();
-                }
-                else if (key.Key == ConsoleKey.D3 || key.Key == ConsoleKey.NumPad3)
-                {
-                    ViewBorrowedBooks(user);
-                }
-                else if (key.Key == ConsoleKey.D4 || key.Key == ConsoleKey.NumPad4)
-                {
-                    EditUserInfo(user);
-                }
-                else if (key.Key == ConsoleKey.D5 || key.Key == ConsoleKey.NumPad5)
-                {
-                    Logout();
-                    return;
-                }
+            int choice = ArrowKeySelection(options.ToList(), header);
+            if (choice == 0)
+            {
+                BrowseBooks();
             }
+            else if (choice == 1)
+            {
+                SearchBooksMenu();
+            }
+            else if (choice == 2)
+            {
+                ViewBorrowedBooks(user);
+            }
+            else if (choice == 3)
+            {
+                EditUserInfo(user);
+            }
+            else if (choice == 4)
+            {
+                Logout();
+                return;
+            }
+
         }
 
         private static void BrowseBooks()
         {
             var books = userAccess.ViewAllBooks();
-            if (books.Any())
+            if (books != null && books.Any())
             {
                 var bookList = books.ToList();
                 Console.Clear();
-                Console.WriteLine("Select a Book to Borrow:");
+                string header = "Select a Book to Borrow:";
 
-                int selectedIndex = ArrowKeySelection(bookList.Select(b => $"{b.BookName} by {b.AuthorName}").ToList());
+                int selectedIndex = ArrowKeySelection(bookList.Select(b => $"{b.BookName} by {b.AuthorName} | Available copies: {b.TotalCopies - b.BorrowedCopies}").ToList(), header);
 
                 var selectedBook = bookList[selectedIndex];
                 userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
                 ShowRecommendations(selectedBook);
             }
+            else
+            {
+                Console.WriteLine("No books available for browsing.");
+            }
         }
+
 
         private static void ShowRecommendations(Book book)
         {
             var recommendedBooks = userAccess.RecommendedBooks(currentUserId.Value);
             Console.Clear();
-            Console.WriteLine("Recommended Books:");
+            string header = "Recommended Books:";
 
             var random = new Random();
             var randomBooks = recommendedBooks.OrderBy(x => random.Next()).Take(5).ToList();
-            int selectedBookIndex = ArrowKeySelection(randomBooks.Select(b => $"{b.BookName} by {b.AuthorName}").ToList());
+            int selectedBookIndex = ArrowKeySelection(randomBooks.Select(b => $"{b.BookName} by {b.AuthorName}").ToList(), header);
 
             if (selectedBookIndex >= 0 && selectedBookIndex < randomBooks.Count)
             {
@@ -217,32 +201,33 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
         }
 
-        private static int ArrowKeySelection(List<string> options)
+        private static int ArrowKeySelection(List<string> options, string head)
         {
             int selectedIndex = 0;
             while (true)
             {
                 Console.Clear();
+                Console.WriteLine(head+"\n\n");
                 for (int i = 0; i < options.Count; i++)
                 {
                     if (i == selectedIndex)
                     {
-                        Console.WriteLine($"-> {options[i]}");
+                        Console.WriteLine($">> {options[i]} <<");
                     }
                     else
                     {
                         Console.WriteLine($"   {options[i]}");
                     }
                 }
-
-                var key = Console.ReadKey();
-                if (key.Key == ConsoleKey.UpArrow && selectedIndex > 0)
+                Console.WriteLine("\n\nUse arrow keys to select.");
+                var key = Console.ReadKey(true);
+                if (key.Key == ConsoleKey.UpArrow)
                 {
-                    selectedIndex--;
+                    selectedIndex = (selectedIndex > 0)? selectedIndex -1 : options.Count -1;
                 }
-                else if (key.Key == ConsoleKey.DownArrow && selectedIndex < options.Count - 1)
+                else if (key.Key == ConsoleKey.DownArrow)
                 {
-                    selectedIndex++;
+                    selectedIndex = (selectedIndex < options.Count -1)? selectedIndex + 1 : 0;
                 }
                 else if (key.Key == ConsoleKey.Enter)
                 {
@@ -260,9 +245,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             string authorName = Console.ReadLine();
 
             var categories = adminAccess.ViewAllCategories();
-            Console.WriteLine("Select Category:");
-
-            var selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList());
+            string header = "Select a category for the book:";
+            var selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
             var selectedCategory = categories.ElementAt(selectedCategoryIndex);
 
             var book = new Book
