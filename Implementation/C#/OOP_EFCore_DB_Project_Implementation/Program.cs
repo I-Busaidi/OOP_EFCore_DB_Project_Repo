@@ -64,9 +64,17 @@ namespace OOP_EFCore_DB_Project_Implementation
             {
                 isAdminLoggedIn = true;
                 isMasterAdmin = admin.MasterAdminId == null;
-                currentUserId = admin.AdminId;
-                Console.WriteLine("Login successful!");
-                ShowAdminMenu(admin);
+
+                if (isMasterAdmin)
+                {
+                    Console.WriteLine("Master Admin Authorized!");
+                    ShowMasterAdminMenu(admin);
+                }
+                else
+                {
+                    Console.WriteLine("Login successful!");
+                    ShowAdminMenu(admin);
+                }
             }
             else
             {
@@ -100,66 +108,111 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         private static void ShowAdminMenu(Admin admin)
         {
+            int choice = -1;
             string header = "Admin Menu:";
             string[] options = { "Add Book", "View All Books", "View Users", "Manage Categories", "Search for Books", "Logout" };
 
-            int choice = ArrowKeySelection(options.ToList(), header);
-            if (choice == 0)
+            do
             {
-                AddBookMenu();
+                choice = ArrowKeySelection(options.ToList(), header);
+                if (choice == 0)
+                {
+                    AddBookMenu();
+                }
+                else if (choice == 1)
+                {
+                    ViewAllBooks();
+                }
+                else if (choice == 2)
+                {
+                    ViewAllUsers();
+                }
+                else if (choice == 3)
+                {
+                    ManageCategories();
+                }
+                else if (choice == 4)
+                {
+                    SearchBooksMenu();
+                }
+                else if (choice == 5)
+                {
+                    Logout();
+                    return;
+                }
             }
-            else if (choice == 1)
-            {
-                ViewAllBooks();
-            }
-            else if (choice == 2)
-            {
-                ViewAllUsers();
-            }
-            else if (choice == 3)
-            {
-                ManageCategories();
-            }
-            else if (choice == 4)
-            {
-                SearchBooksMenu();
-            }
-            else if (choice == 5)
-            {
-                Logout();
-                return;
-            }
+            while (choice != 5);
+        }
 
+        private static void ShowMasterAdminMenu(Admin admin)
+        {
+            int choice = -1;
+            string header = "Master Admin Menu:";
+            string[] options = { "Add Book", "View All Books", "View Users", "Manage Categories", "Search for Books", "Logout" };
+
+            do
+            {
+                choice = ArrowKeySelection(options.ToList(), header);
+                if (choice == 0)
+                {
+                    AddBookMenu();
+                }
+                else if (choice == 1)
+                {
+                    ViewAllBooks();
+                }
+                else if (choice == 2)
+                {
+                    ViewAllUsers();
+                }
+                else if (choice == 3)
+                {
+                    ManageCategories();
+                }
+                else if (choice == 4)
+                {
+                    SearchBooksMenu();
+                }
+                else if (choice == 5)
+                {
+                    Logout();
+                    return;
+                }
+            }
+            while (choice != 5);
         }
 
         private static void ShowUserMenu(User user)
         {
+            int choice = -1;
             string header = "User Menu:";
             string[] options = {"Browse Books", "Search for Books", "View Borrowed Books", "Edit User Info", "Logout"};
-
-            int choice = ArrowKeySelection(options.ToList(), header);
-            if (choice == 0)
+            do
             {
-                BrowseBooks();
+                choice = ArrowKeySelection(options.ToList(), header);
+                if (choice == 0)
+                {
+                    BrowseBooks();
+                }
+                else if (choice == 1)
+                {
+                    SearchBooksMenu();
+                }
+                else if (choice == 2)
+                {
+                    ViewBorrowedBooks(user);
+                }
+                else if (choice == 3)
+                {
+                    EditUserInfo(user);
+                }
+                else if (choice == 4)
+                {
+                    Logout();
+                    return;
+                }
             }
-            else if (choice == 1)
-            {
-                SearchBooksMenu();
-            }
-            else if (choice == 2)
-            {
-                ViewBorrowedBooks(user);
-            }
-            else if (choice == 3)
-            {
-                EditUserInfo(user);
-            }
-            else if (choice == 4)
-            {
-                Logout();
-                return;
-            }
-
+            while (choice != 4);
         }
 
         private static void BrowseBooks()
@@ -246,7 +299,7 @@ namespace OOP_EFCore_DB_Project_Implementation
 
             var categories = adminAccess.ViewAllCategories();
             string header = "Select a category for the book:";
-            var selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
+            int selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
             var selectedCategory = categories.ElementAt(selectedCategoryIndex);
 
             var book = new Book
@@ -297,6 +350,31 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         private static void ManageCategories()
         {
+            int choice = -1;
+            string header = "Select an option:";
+            string[] options = {"Add category", "Change category name", "Delete category", "Exit category management"};
+
+            do
+            {
+                choice = ArrowKeySelection(options.ToList(), header);
+                switch (choice)
+                {
+                    case 0:
+                        break;
+
+                    case 1:
+                        break;
+
+                    case 2:
+                        break;
+
+                    case 3:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            while (choice != 3);
         }
 
         private static void ViewBorrowedBooks(User user)
