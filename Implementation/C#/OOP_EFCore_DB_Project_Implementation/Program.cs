@@ -1,154 +1,345 @@
 ﻿using OOP_EFCore_DB_Project_Implementation.Models;
 using OOP_EFCore_DB_Project_Implementation.Repositories;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace OOP_EFCore_DB_Project_Implementation
 {
     internal class Program
     {
+        private static int? currentUserId = null;
+        private static bool isUserLoggedIn = false;
+        private static bool isAdminLoggedIn = false;
+        private static bool isMasterAdmin = false;
+        private static UserAccess userAccess;
+        private static AdminAccess adminAccess;
+        private static LibraryAppDbContext dbContext;
+
         static void Main(string[] args)
         {
-            using var dbContext = new LibraryAppDbContext();
+            dbContext = new LibraryAppDbContext();
             var adminRepository = new AdminRepo(dbContext);
             var userRepository = new UserRepo(dbContext);
             var bookRepository = new BookRepo(dbContext);
             var categoryRepository = new CategoryRepo(dbContext);
             var borrowRepository = new BorrowRepo(dbContext);
+            adminAccess = new AdminAccess(adminRepository, userRepository, bookRepository, categoryRepository, borrowRepository);
+            userAccess = new UserAccess(userRepository, bookRepository, borrowRepository, categoryRepository);
 
-            var adminAccess = new AdminAccess(adminRepository, userRepository, bookRepository, categoryRepository, borrowRepository);
-            var userAccess = new UserAccess(userRepository, bookRepository, borrowRepository, categoryRepository);
+            Console.WriteLine("Welcome to the Library Management System!");
+            ShowLoginMenu();
+        }
 
-            Console.WriteLine("Welcome to the Library Management System");
-
+        private static void ShowLoginMenu()
+        {
             while (true)
             {
-                Console.WriteLine("Are you an (1) Admin or (2) User? (Type 'exit' to exit)");
-                string userType = Console.ReadLine();
+                Console.Clear();
+                Console.WriteLine("Select an option to login:");
+                Console.WriteLine("1. Admin Login");
+                Console.WriteLine("2. User Login");
+                Console.WriteLine("3. Exit");
 
-                if (userType == "exit")
-                    break;
-
-                switch (userType)
+                var key = Console.ReadKey();
+                if (key.Key == ConsoleKey.D1 || key.Key == ConsoleKey.NumPad1)
                 {
-                    case "1":
-                        AdminInteraction(adminAccess);
-                        break;
-                    case "2":
-                        UserInteraction(userAccess);
-                        break;
-                    default:
-                        Console.WriteLine("Invalid choice. Please try again.");
-                        break;
+                    AdminLogin();
+                }
+                else if (key.Key == ConsoleKey.D2 || key.Key == ConsoleKey.NumPad2)
+                {
+                    UserLogin();
+                }
+                else if (key.Key == ConsoleKey.D3 || key.Key == ConsoleKey.NumPad3)
+                {
+                    Environment.Exit(0);
                 }
             }
         }
 
-        static void AdminInteraction(AdminAccess adminAccess)
+        private static void AdminLogin()
         {
-            Console.WriteLine("Admin Mode");
-
-            Console.WriteLine("Enter your email:");
-            var email = Console.ReadLine();
-            Console.WriteLine("Enter your password:");
-            var password = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("Enter Admin Email:");
+            string email = Console.ReadLine();
+            Console.WriteLine("Enter Admin Password:");
+            string password = Console.ReadLine();
 
             var admin = adminAccess.LoginAdmin(email, password);
-
             if (admin != null)
             {
-                Console.WriteLine("Logged in successfully!");
-
-                bool exit = false;
-                while (!exit)
-                {
-                    Console.WriteLine("Choose an action: (1) Add Book (2) Update Book (3) Delete Book (4) View All Books (5) Logout");
-                    var action = Console.ReadLine();
-
-                    switch (action)
-                    {
-                        case "1":
-                            
-                            break;
-                        case "2":
-                            
-                            break;
-                        case "3":
-                            
-                            break;
-                        case "4":
-                            
-                            break;
-                        case "5":
-                            exit = true;
-                            break;
-                        default:
-                            Console.WriteLine("Invalid choice. Please try again.");
-                            break;
-                    }
-                }
+                isAdminLoggedIn = true;
+                isMasterAdmin = admin.MasterAdminId == null;
+                currentUserId = admin.AdminId;
+                Console.WriteLine("Login successful!");
+                ShowAdminMenu(admin);
             }
             else
             {
-                Console.WriteLine("Invalid email or password.");
+                Console.WriteLine("Invalid credentials. Try again.");
+                Console.ReadLine();
             }
         }
 
-        static void UserInteraction(UserAccess userAccess)
+        private static void UserLogin()
         {
-            Console.WriteLine("User Mode");
-
-            Console.WriteLine("Enter your email:");
+            Console.Clear();
+            Console.WriteLine("Enter User Email:");
             string email = Console.ReadLine();
+            Console.WriteLine("Enter User Password:");
+            string password = Console.ReadLine();
 
-            Console.WriteLine("Enter your passcode:");
-            string passcode = Console.ReadLine();
-
-            var user = userAccess.LoginUser(email, passcode);
-
+            var user = userAccess.LoginUser(email, password);
             if (user != null)
             {
-                Console.WriteLine("Logged in successfully!");
-
-                bool exit = false;
-                while (!exit)
-                {
-                    Console.WriteLine("Choose an action: (1) View Books (2) Borrow Book (3) Return Book (4) Logout");
-                    var action = Console.ReadLine();
-
-                    switch (action)
-                    {
-                        case "1":
-                            var allBooks = userAccess.ViewAllBooks();
-                            Console.WriteLine("Books:");
-                            foreach (var b in allBooks)
-                            {
-                                Console.WriteLine($"ID: {b.BookId}, Name: {b.BookName}, Category: {b.Category.CatName}, Price: {b.CopyPrice}, Available Copies: {b.TotalCopies - b.BorrowedCopies}");
-                            }
-                            break;
-                        case "2":
-                            Console.WriteLine("Enter the ID of the book to borrow:");
-                            var bookIdToBorrow = int.Parse(Console.ReadLine());
-                            userAccess.BorrowBook(user.UserId, bookIdToBorrow);
-                            Console.WriteLine("Book borrowed successfully!");
-                            break;
-                        case "3":
-                            Console.WriteLine("Enter the ID of the book to return:");
-                            var bookIdToReturn = int.Parse(Console.ReadLine());
-                            userAccess.ReturnBook(user.UserId, bookIdToReturn);
-                            Console.WriteLine("Book returned successfully!");
-                            break;
-                        case "4":
-                            exit = true;
-                            break;
-                        default:
-                            Console.WriteLine("Invalid choice. Please try again.");
-                            break;
-                    }
-                }
+                currentUserId = user.UserId;
+                isUserLoggedIn = true;
+                Console.WriteLine("Login successful!");
+                ShowUserMenu(user);
             }
             else
             {
-                Console.WriteLine("Invalid passcode.");
+                Console.WriteLine("Invalid credentials. Try again.");
+                Console.ReadLine();
             }
+        }
+
+        private static void ShowAdminMenu(Admin admin)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("Admin Menu:");
+                Console.WriteLine("1. Add Book");
+                Console.WriteLine("2. View All Books");
+                Console.WriteLine("3. View Users");
+                Console.WriteLine("4. Manage Categories");
+                Console.WriteLine("5. Search for Books");
+                Console.WriteLine("6. Logout");
+
+                var key = Console.ReadKey();
+                if (key.Key == ConsoleKey.D1 || key.Key == ConsoleKey.NumPad1)
+                {
+                    AddBookMenu();
+                }
+                else if (key.Key == ConsoleKey.D2 || key.Key == ConsoleKey.NumPad2)
+                {
+                    ViewAllBooks();
+                }
+                else if (key.Key == ConsoleKey.D3 || key.Key == ConsoleKey.NumPad3)
+                {
+                    ViewAllUsers();
+                }
+                else if (key.Key == ConsoleKey.D4 || key.Key == ConsoleKey.NumPad4)
+                {
+                    ManageCategories();
+                }
+                else if (key.Key == ConsoleKey.D5 || key.Key == ConsoleKey.NumPad5)
+                {
+                    SearchBooksMenu();
+                }
+                else if (key.Key == ConsoleKey.D6 || key.Key == ConsoleKey.NumPad6)
+                {
+                    Logout();
+                    return;
+                }
+            }
+        }
+
+        private static void ShowUserMenu(User user)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("User Menu:");
+                Console.WriteLine("1. Browse Books");
+                Console.WriteLine("2. Search for Books");
+                Console.WriteLine("3. View Borrowed Books");
+                Console.WriteLine("4. Edit User Info");
+                Console.WriteLine("5. Logout");
+
+                var key = Console.ReadKey();
+                if (key.Key == ConsoleKey.D1 || key.Key == ConsoleKey.NumPad1)
+                {
+                    BrowseBooks();
+                }
+                else if (key.Key == ConsoleKey.D2 || key.Key == ConsoleKey.NumPad2)
+                {
+                    SearchBooksMenu();
+                }
+                else if (key.Key == ConsoleKey.D3 || key.Key == ConsoleKey.NumPad3)
+                {
+                    ViewBorrowedBooks(user);
+                }
+                else if (key.Key == ConsoleKey.D4 || key.Key == ConsoleKey.NumPad4)
+                {
+                    EditUserInfo(user);
+                }
+                else if (key.Key == ConsoleKey.D5 || key.Key == ConsoleKey.NumPad5)
+                {
+                    Logout();
+                    return;
+                }
+            }
+        }
+
+        private static void BrowseBooks()
+        {
+            var books = userAccess.ViewAllBooks();
+            if (books.Any())
+            {
+                var bookList = books.ToList();
+                Console.Clear();
+                Console.WriteLine("Select a Book to Borrow:");
+
+                int selectedIndex = ArrowKeySelection(bookList.Select(b => $"{b.BookName} by {b.AuthorName}").ToList());
+
+                var selectedBook = bookList[selectedIndex];
+                userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
+                ShowRecommendations(selectedBook);
+            }
+        }
+
+        private static void ShowRecommendations(Book book)
+        {
+            var recommendedBooks = userAccess.RecommendedBooks(currentUserId.Value);
+            Console.Clear();
+            Console.WriteLine("Recommended Books:");
+
+            var random = new Random();
+            var randomBooks = recommendedBooks.OrderBy(x => random.Next()).Take(5).ToList();
+            int selectedBookIndex = ArrowKeySelection(randomBooks.Select(b => $"{b.BookName} by {b.AuthorName}").ToList());
+
+            if (selectedBookIndex >= 0 && selectedBookIndex < randomBooks.Count)
+            {
+                var selectedBook = randomBooks[selectedBookIndex];
+                userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
+            }
+        }
+
+        private static int ArrowKeySelection(List<string> options)
+        {
+            int selectedIndex = 0;
+            while (true)
+            {
+                Console.Clear();
+                for (int i = 0; i < options.Count; i++)
+                {
+                    if (i == selectedIndex)
+                    {
+                        Console.WriteLine($"-> {options[i]}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"   {options[i]}");
+                    }
+                }
+
+                var key = Console.ReadKey();
+                if (key.Key == ConsoleKey.UpArrow && selectedIndex > 0)
+                {
+                    selectedIndex--;
+                }
+                else if (key.Key == ConsoleKey.DownArrow && selectedIndex < options.Count - 1)
+                {
+                    selectedIndex++;
+                }
+                else if (key.Key == ConsoleKey.Enter)
+                {
+                    return selectedIndex;
+                }
+            }
+        }
+
+        private static void AddBookMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("Enter Book Name:");
+            string bookName = Console.ReadLine();
+            Console.WriteLine("Enter Author Name:");
+            string authorName = Console.ReadLine();
+
+            var categories = adminAccess.ViewAllCategories();
+            Console.WriteLine("Select Category:");
+
+            var selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList());
+            var selectedCategory = categories.ElementAt(selectedCategoryIndex);
+
+            var book = new Book
+            {
+                BookName = bookName,
+                AuthorName = authorName,
+                CatId = selectedCategory.CatId
+            };
+
+            adminAccess.AddBook(book);
+        }
+
+        private static void SearchBooksMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("Enter Book Name or Author Name to Search:");
+            string searchTerm = Console.ReadLine();
+
+            var books = userAccess.SearchBooks(searchTerm);
+            foreach (var book in books)
+            {
+                Console.WriteLine($"{book.BookName} by {book.AuthorName}");
+            }
+            Console.ReadLine();
+        }
+
+        private static void ViewAllBooks()
+        {
+            Console.Clear();
+            var books = adminAccess.ViewAllBooks();
+            foreach (var book in books)
+            {
+                Console.WriteLine($"{book.BookName} by {book.AuthorName}");
+            }
+            Console.ReadLine();
+        }
+
+        private static void ViewAllUsers()
+        {
+            Console.Clear();
+            var users = adminAccess.ViewAllUsers();
+            foreach (var user in users)
+            {
+                Console.WriteLine($"User: {user.Email}");
+            }
+            Console.ReadLine();
+        }
+
+        private static void ManageCategories()
+        {
+        }
+
+        private static void ViewBorrowedBooks(User user)
+        {
+            Console.Clear();
+            var borrowedBooks = userAccess.GetCurrentBorrows(user.UserId);
+            foreach (var book in borrowedBooks)
+            {
+                Console.WriteLine($"{book.Book.BookName} by {book.Book.AuthorName}");
+            }
+            Console.ReadLine();
+        }
+
+        private static void EditUserInfo(User user)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter new email:");
+            string newEmail = Console.ReadLine();
+            userAccess.EditInfo(user);
+        }
+
+        private static void Logout()
+        {
+            isUserLoggedIn = false;
+            isAdminLoggedIn = false;
+            currentUserId = null;
+            ShowLoginMenu();
         }
     }
 }
