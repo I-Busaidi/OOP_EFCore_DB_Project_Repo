@@ -25,18 +25,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             borrowRepo = borrowRepository;
         }
 
-        public bool IsMasterAdmin(int id)
+        public bool IsMasterAdmin(Admin admin)
         {
-            var admin = adminRepo.GetAll().FirstOrDefault(a => a.MasterAdminId == id);
-
-            if (admin == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return admin.MasterAdminId == null;
         }
 
         public void RegisterAdmin(Admin admin)

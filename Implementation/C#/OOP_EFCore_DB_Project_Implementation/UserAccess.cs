@@ -25,7 +25,26 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         public void RegisterUser(User user)
         {
-            userRepo.Insert(user);
+            if (userRepo.GetByEmail(user.Email) == null)
+            {
+                userRepo.Insert(user);
+            }
+            else
+            {
+                Console.WriteLine("This user email is already in use.");
+            }
+        }
+
+        public void EditInfo(User user)
+        {
+            if (userRepo.GetByEmail(user.Email) == null || userRepo.GetById(user.UserId).Email == user.Email)
+            {
+                userRepo.UpdateByName(user, user.FName, user.LName);
+            }
+            else
+            {
+                Console.WriteLine("This user email is already in use.");
+            }
         }
 
         public User LoginUser(string userEmail, string passcode)
@@ -45,19 +64,38 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         public void BorrowBook(int userId, int bookId)
         {
+            var user = userRepo.GetById(userId);
             var book = bookRepo.GetAll().FirstOrDefault(b => b.BookId == bookId);
-            if (book != null && book.TotalCopies - book.BorrowedCopies > 0)
+            if (book != null && book.TotalCopies > book.BorrowedCopies)
             {
-                borrowRepo.Insert(new Borrow
+                if (!user.Borrows.Any(b => b.BookId == bookId && !b.IsReturned))
                 {
-                    BookId = bookId,
-                    UserId = userId,
-                    BorrowDate = DateTime.Now,
-                    ReturnDate = DateTime.Now.AddDays(book.BorrowPeriod),
-                    IsReturned = false
-                });
-                book.BorrowedCopies++;
-                bookRepo.UpdateByName(book, book.BookName);
+                    if (!user.Borrows.Any(b => !b.IsReturned && b.ReturnDate < DateTime.Now))
+                    {
+                        borrowRepo.Insert(new Borrow
+                        {
+                            BookId = bookId,
+                            UserId = userId,
+                            BorrowDate = DateTime.Now,
+                            ReturnDate = DateTime.Now.AddDays(book.BorrowPeriod),
+                            IsReturned = false
+                        });
+                        book.BorrowedCopies++;
+                        bookRepo.UpdateByName(book, book.BookName);
+                    }
+                    else
+                    {
+                        Console.WriteLine("User has overdue books that must be returned first.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Used is currently borrowing this book already.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No copies available for borrowing.");
             }
         }
 
@@ -77,6 +115,52 @@ namespace OOP_EFCore_DB_Project_Implementation
                     bookRepo.UpdateByName(book, book.BookName);
                 }
             }
+        }
+
+        public IEnumerable<Borrow> GetCurrentBorrows(int userId) 
+        { 
+            return borrowRepo.GetUserBorrowsById(userId).Where(b => !b.IsReturned); 
+        }
+
+        public IEnumerable<Borrow> GetBorrowHistory(int userId) 
+        { 
+            return borrowRepo.GetUserBorrowsById(userId); 
+        }
+
+
+
+        public IEnumerable<Book> RecommendedBooks(int uId)
+        {
+            var userBorrows = borrowRepo.GetUserBorrowsById(uId);
+            var borrowCategory = userBorrows.Select(b => b.Book.CatId).Distinct();
+            var recommendedBooks = bookRepo.GetAll()
+                                           .Where(b => borrowCategory
+                                           .Contains(b.CatId) && b.BorrowedCopies < b.TotalCopies)
+                                           .ToList();
+            var otherUserBorrows = borrowRepo.GetAll()
+                                             .Where(b => borrowCategory.Contains(b.Book.CatId) && b.UserId != uId)
+                                             .Select(b => b.Book)
+                                             .Distinct()
+                                             .ToList();
+            recommendedBooks.AddRange(otherUserBorrows.Except(recommendedBooks));
+            return recommendedBooks;
+        }
+
+        public IEnumerable<Book> SearchBooks(string query) 
+        { 
+            return bookRepo.GetAll()
+                           .Where(b => b.BookName
+                           .Contains(query, StringComparison.OrdinalIgnoreCase) 
+                           || b.AuthorName.Contains(query, StringComparison.OrdinalIgnoreCase))
+                           .ToList(); 
+        }
+
+        public IEnumerable<Book> FilterBooksByCategory(string categoryName) 
+        {
+            return bookRepo.GetAll()
+                           .Where(b => b.Category.CatName
+                           .Equals(categoryName, StringComparison.OrdinalIgnoreCase))
+                           .ToList(); 
         }
     }
 }
