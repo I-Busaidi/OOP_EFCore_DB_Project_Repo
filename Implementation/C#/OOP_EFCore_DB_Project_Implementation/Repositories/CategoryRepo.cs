@@ -51,6 +51,38 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
                 }
             }
         }
+        public void IncrementBookNo(Category category, string name)
+        {
+            var categoryToUpdate = GetByName(name);
+            if (categoryToUpdate != null)
+            {
+                try
+                {
+                    categoryToUpdate.NumOfBooks += 1;
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
+            }
+        }
+        public void DecrementBookNo(Category category, string name)
+        {
+            var categoryToUpdate = GetByName(name);
+            if (categoryToUpdate != null)
+            {
+                try
+                {
+                    categoryToUpdate.NumOfBooks -= 1;
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
+            }
+        }
         public void DeleteById(int id)
         {
             var category = _context.Categories.Find(id);

@@ -21,9 +21,9 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             return _context.Users.ToList();
         }
 
-        public User GetByName(string fname, string lname)
+        public IEnumerable<User> GetByName(string name)
         {
-            return _context.Users.FirstOrDefault(u => u.FName == fname && u.LName == lname);
+            return _context.Users.Where( u => u.FName.Contains(name) || u.LName.Contains(name));
         }
 
         public User GetByEmail(string email)
@@ -49,14 +49,18 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             }
         }
 
-        public void UpdateByName(User user, string fname, string lname)
+        public void UpdateById(User user, int id)
         {
-            var userToUpdate = GetByName(fname, lname);
+            var userToUpdate = GetById(id);
             if (userToUpdate != null)
             {
                 try
                 {
-                    _context.Users.Entry(userToUpdate).CurrentValues.SetValues(user);
+                    userToUpdate.FName = user.FName;
+                    userToUpdate.LName = user.LName;
+                    userToUpdate.Email = user.Email;
+                    userToUpdate.Gender = user.Gender;
+                    userToUpdate.Passcode = user.Passcode;
                     _context.SaveChanges();
                 }
                 catch (Exception ex)

@@ -9,11 +9,11 @@ namespace OOP_EFCore_DB_Project_Implementation
     public interface IUsersRepo<T>
     {
         IEnumerable<T> GetAll();
-        T GetByName(string fname, string lname);
+        IEnumerable<T> GetByName(string name);
         T GetByEmail(string email);
         T GetById(int id);
         void Insert(T entity);
-        void UpdateByName(T entity, string fname, string lname);
+        void UpdateById(T entity, int id);
         void DeleteById(int id);
     }
 }

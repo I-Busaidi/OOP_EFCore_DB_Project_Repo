@@ -42,6 +42,11 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
         }
 
+        public Admin GetMasterAdminSecets() //FOR TESTING ONLY
+        {
+            return adminRepo.GetAll().FirstOrDefault(a => a.MasterAdminId == null);
+        }
+
         public void RemoveAdmin(int id)
         {
             adminRepo.DeleteById(id);
@@ -51,7 +56,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             if (adminRepo.GetByEmail(admin.AdminEmail) == null || adminRepo.GetById(admin.AdminId).AdminEmail == admin.AdminEmail)
             {
-                adminRepo.UpdateByName(admin, admin.AdminFname, admin.AdminLname);
+                adminRepo.UpdateById(admin, admin.AdminId);
             }
             else
             {
@@ -161,7 +166,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             if (userRepo.GetByEmail(user.Email) == null || userRepo.GetById(user.UserId).Email == user.Email)
             {
-                userRepo.UpdateByName(user, user.FName, user.LName);
+                userRepo.UpdateById(user, user.UserId);
             }
             else
             {

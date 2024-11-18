@@ -42,7 +42,13 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             {
                 try
                 {
-                    _context.Books.Entry(bookToUpdate).CurrentValues.SetValues(book);
+                    bookToUpdate.BookName = book.BookName;
+                    bookToUpdate.AuthorName = book.AuthorName;
+                    bookToUpdate.BorrowPeriod = book.BorrowPeriod;
+                    bookToUpdate.BorrowedCopies = book.BorrowedCopies;
+                    bookToUpdate.CopyPrice = book.CopyPrice;
+                    bookToUpdate.CatId = book.CatId;
+                    bookToUpdate.TotalCopies = book.TotalCopies;
                     _context.SaveChanges();
                 }
                 catch (Exception ex)

@@ -19,10 +19,9 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         {
             return _context.Admins.ToList();
         }
-        public Admin GetByName(string firstName, string? lastName)
+        public IEnumerable<Admin> GetByName(string name)
         {
-            return _context.Admins.FirstOrDefault(a => a.AdminFname == firstName
-                                                    && a.AdminLname == lastName);
+            return _context.Admins.Where(a => a.AdminFname.Contains(name) || a.AdminLname.Contains(name));
         }
 
         public Admin GetByEmail(string email)
@@ -47,14 +46,18 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
                 Console.WriteLine(ex.Message.ToString());
             }
         }
-        public void UpdateByName(Admin admin, string firstName, string? lastName)
+        public void UpdateById(Admin admin, int id)
         {
-            var adminToUpdate = GetByName(firstName, lastName);
+            var adminToUpdate = GetById(id);
             if (adminToUpdate != null)
             {
                 try
                 {
-                    _context.Admins.Entry(adminToUpdate).CurrentValues.SetValues(admin);
+                    adminToUpdate.AdminEmail = admin.AdminEmail;
+                    adminToUpdate.AdminLname = admin.AdminLname;
+                    adminToUpdate.AdminFname = admin.AdminFname;
+                    adminToUpdate.AdminPasscode = admin.AdminPasscode;
+                    adminToUpdate.MasterAdminId = admin.MasterAdminId;
                     _context.SaveChanges();
                 }
                 catch (Exception ex)

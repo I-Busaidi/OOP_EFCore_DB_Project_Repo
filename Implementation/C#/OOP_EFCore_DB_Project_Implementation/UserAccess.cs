@@ -39,7 +39,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             if (userRepo.GetByEmail(user.Email) == null || userRepo.GetById(user.UserId).Email == user.Email)
             {
-                userRepo.UpdateByName(user, user.FName, user.LName);
+                userRepo.UpdateById(user, user.UserId);
             }
             else
             {

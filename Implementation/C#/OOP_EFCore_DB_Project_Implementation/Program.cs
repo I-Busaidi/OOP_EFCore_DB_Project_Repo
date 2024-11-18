@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace OOP_EFCore_DB_Project_Implementation
 {
@@ -40,149 +41,15 @@ namespace OOP_EFCore_DB_Project_Implementation
             ShowLoginMenu();
         }
 
-        private static void ShowLoginMenu()
+
+        //========== UTILITY FUNCTIONS ==========//
+        private static void Logout()
         {
-            string header = "Select an option to login:";
-            string[] loginOptions = { "Admin Login", "User Login", "Register User", "Exit" };
-            int choice = ArrowKeySelection(loginOptions.ToList(), header);
-
-            if (choice == 0)
-            {
-                AdminLogin();
-            }
-            else if (choice == 1)
-            {
-                UserLogin();
-            }
-            else if (choice == 2)
-            {
-                AddUser();
-            }
-            else if (choice == 3)
-            {
-                return;
-            }
-        }
-
-        private static void AddUser()
-        {
-            Console.Clear();
-            Console.Write("Enter the first name: ");
-            string fname = Console.ReadLine();
-            Console.Write("\nEnter the last name: ");
-            string lname = Console.ReadLine();
-            Console.Clear();
-            Console.WriteLine("Enter the user email (example@example.com):");
-            string email;
-            while(string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(email, emailPattern))
-            {
-                if(!Regex.IsMatch(emailPattern, email))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Enter the user email (example@example.com):");
-                    Console.WriteLine("Email does not match the above pattern, please try again.");
-                }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("Enter the user email (example@example.com):");
-                    Console.WriteLine("Invalid email, please try again.");
-                }
-            }
-            Console.Clear();
-            Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
-            string password;
-            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
-            {
-                if (!Regex.IsMatch(passcodePattern, password))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
-                    Console.WriteLine("Password does not match the above pattern, please try again.");
-                }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
-                    Console.WriteLine("Invalid password, please try again.");
-                }
-            }
-
-            Console.Clear();
-            string header = "Select gender:";
-            string[] genderOption = {"Male", "Female"};
-            int choice = ArrowKeySelection(genderOption.ToList(), header);
-
-            var user = new User
-            {
-                FName = fname,
-                LName = lname,
-                Email = email,
-                Passcode = password,
-                Gender = genderOption[choice]
-            };
-            userAccess.RegisterUser(user);
-            Console.WriteLine($"User \"{user.FName} {user.LName}\" added successfully.");
+            isUserLoggedIn = false;
+            isAdminLoggedIn = false;
+            currentUserId = null;
             ShowLoginMenu();
         }
-
-        private static void AddAdmin()
-        {
-            Console.Clear();
-            Console.Write("Enter the first name: ");
-            string fname = Console.ReadLine();
-            Console.Write("\nEnter the last name: ");
-            string lname = Console.ReadLine();
-            Console.Clear();
-            Console.WriteLine("Enter the admin email (example@example.com):");
-            string email;
-            while (string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(email, emailPattern))
-            {
-                if (!Regex.IsMatch(emailPattern, email))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Enter the admin email (example@example.com):");
-                    Console.WriteLine("Email does not match the above pattern, please try again.");
-                }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("Enter the admin email (example@example.com):");
-                    Console.WriteLine("Invalid email, please try again.");
-                }
-            }
-            Console.Clear();
-            Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
-            string password;
-            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
-            {
-                if (!Regex.IsMatch(passcodePattern, password))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
-                    Console.WriteLine("Password does not match the above pattern, please try again.");
-                }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
-                    Console.WriteLine("Invalid password, please try again.");
-                }
-            }
-
-            var admin = new Admin
-            {
-                AdminFname = fname,
-                AdminLname = lname,
-                AdminEmail = email,
-                AdminPasscode = password,
-                MasterAdminId = 1
-            };
-            adminAccess.RegisterAdmin(admin);
-            Console.WriteLine($"Admin \"{admin.AdminFname} {admin.AdminLname}\" added successfully.");
-            ShowLoginMenu();
-        }
-
         private static void InitialSetup()
         {
             Console.WriteLine("Welcome, please complete the initial setup to use the system.");
@@ -479,13 +346,320 @@ namespace OOP_EFCore_DB_Project_Implementation
             Console.WriteLine("Initial setup completed!\nPress any key to continue...");
             Console.ReadKey();
         }
+        private static void ShowLoginMenu()
+        {
+            string header = "Select an option to login:";
+            string[] loginOptions = { "Admin Login", "User Login", "Register User", "Exit" };
+            int choice = ArrowKeySelection(loginOptions.ToList(), header);
 
-        private static void AdminLogin()
+            if (choice == 0)
+            {
+                AdminLogin();
+            }
+            else if (choice == 1)
+            {
+                UserLogin();
+            }
+            else if (choice == 2)
+            {
+                AddUser();
+            }
+            else if (choice == 3)
+            {
+                return;
+            }
+        }
+        private static int ArrowKeySelection(List<string> options, string head)
+        {
+            int selectedIndex = 0;
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine(head + "\n\n");
+                for (int i = 0; i < options.Count; i++)
+                {
+                    if (i == selectedIndex)
+                    {
+                        Console.WriteLine($">> {options[i]} <<");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"   {options[i]}");
+                    }
+                }
+                Console.WriteLine("\n\nUse arrow keys to select.");
+                var key = Console.ReadKey(true);
+                if (key.Key == ConsoleKey.UpArrow)
+                {
+                    selectedIndex = (selectedIndex > 0) ? selectedIndex - 1 : options.Count - 1;
+                }
+                else if (key.Key == ConsoleKey.DownArrow)
+                {
+                    selectedIndex = (selectedIndex < options.Count - 1) ? selectedIndex + 1 : 0;
+                }
+                else if (key.Key == ConsoleKey.Enter)
+                {
+                    return selectedIndex;
+                }
+            }
+        }
+
+
+        //========== USER RELATED OPERATIONS ==========//
+        private static void AddUser()
         {
             Console.Clear();
-            Console.WriteLine("Enter Admin Email:");
+            Console.Write("Enter the first name: ");
+            string fname = Console.ReadLine();
+            Console.Write("\nEnter the last name: ");
+            string lname = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("Enter the user email (example@example.com):");
+            string email;
+            while(string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(email, emailPattern))
+            {
+                if(!Regex.IsMatch(emailPattern, email))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the user email (example@example.com):");
+                    Console.WriteLine("Email does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the user email (example@example.com):");
+                    Console.WriteLine("Invalid email, please try again.");
+                }
+            }
+            Console.Clear();
+            Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+            string password;
+            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
+            {
+                if (!Regex.IsMatch(passcodePattern, password))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Password does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Invalid password, please try again.");
+                }
+            }
+
+            Console.Clear();
+            string header = "Select gender:";
+            string[] genderOption = {"Male", "Female"};
+            int choice = ArrowKeySelection(genderOption.ToList(), header);
+
+            var user = new User
+            {
+                FName = fname,
+                LName = lname,
+                Email = email,
+                Passcode = password,
+                Gender = genderOption[choice]
+            };
+            userAccess.RegisterUser(user);
+            Console.WriteLine($"User \"{user.FName} {user.LName}\" added successfully.");
+            ShowLoginMenu();
+        }
+        private static void ViewAllUsers()
+        {
+            Console.Clear();
+            var users = adminAccess.ViewAllUsers();
+            int counter = 1;
+            string border = new string('=', 60);
+            StringBuilder sb = new StringBuilder();
+            foreach (var user in users)
+            {
+                sb.AppendLine($"{counter, -3} | {user.FName+" "+user.LName, -25} | {user.Email}");
+                counter++;
+            }
+            Console.WriteLine($"{"No.",-3} | {"Name",-25} | Email");
+            Console.WriteLine(border);
+            Console.WriteLine(sb.ToString());
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
+        private static void UserLogin()
+        {
+            Console.Clear();
+            Console.WriteLine("Enter User Email:");
             string email = Console.ReadLine();
-            Console.WriteLine("Enter Admin Password:");
+            Console.WriteLine("Enter User Password:");
+            string password = Console.ReadLine();
+
+            var user = userAccess.LoginUser(email, password);
+            if (user != null)
+            {
+                currentUserId = user.UserId;
+                isUserLoggedIn = true;
+                Console.WriteLine("Login successful!");
+                ShowUserMenu(user);
+            }
+            else
+            {
+                Console.WriteLine("Invalid credentials. Try again.");
+                Console.ReadLine();
+            }
+        }
+        private static void ShowUserMenu(User user)
+        {
+            int choice = -1;
+            string header = "User Menu:";
+            string[] options = { "Browse Books", "Search for Books", "View Borrowed Books", "Edit User Info", "Logout" };
+            do
+            {
+                choice = ArrowKeySelection(options.ToList(), header);
+                if (choice == 0)
+                {
+                    BrowseBooks();
+                }
+                else if (choice == 1)
+                {
+                    SearchBooks();
+                }
+                else if (choice == 2)
+                {
+                    ViewBorrowedBooks(user);
+                }
+                else if (choice == 3)
+                {
+                    EditUserInfo(user);
+                }
+                else if (choice == 4)
+                {
+                    Logout();
+                    return;
+                }
+            }
+            while (choice != 4);
+        }
+        private static void ViewBorrowedBooks(User user)
+        {
+            Console.Clear();
+            var borrowedBooks = userAccess.GetCurrentBorrows(user.UserId);
+            foreach (var book in borrowedBooks)
+            {
+                Console.WriteLine($"{book.Book.BookName} by {book.Book.AuthorName}");
+            }
+            Console.ReadLine();
+        }
+        private static void EditUserInfo(User user)
+        {
+            
+        }
+        private static void EditUserName(User user)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the new first name for user:");
+            string newFname;
+            while(string.IsNullOrEmpty(newFname = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new first name for user:");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            Console.WriteLine("Enter the new last name for user:");
+            string newLname;
+            while (string.IsNullOrEmpty(newLname = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new last name for user:");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            userAccess.EditInfo(new User
+            {
+                UserId = user.UserId,
+                FName = newFname,
+                LName = newLname,
+                Email = user.Email,
+                Passcode = user.Passcode,
+                Gender = user.Gender,
+            });
+        }
+        private static void EditUserEmail(User user)
+        {
+
+        }
+        private static void EditUserPasscode(User user)
+        {
+
+        }
+
+
+        //========== ADMIN RELATED OPERATIONS ==========//
+        private static void AddAdmin()
+        {
+            Console.Clear();
+            Console.Write("Enter the first name: ");
+            string fname = Console.ReadLine();
+            Console.Write("\nEnter the last name: ");
+            string lname = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("Enter the admin email (example@example.com):");
+            string email;
+            while (string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(email, emailPattern))
+            {
+                if (!Regex.IsMatch(emailPattern, email))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the admin email (example@example.com):");
+                    Console.WriteLine("Email does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the admin email (example@example.com):");
+                    Console.WriteLine("Invalid email, please try again.");
+                }
+            }
+            Console.Clear();
+            Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+            string password;
+            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
+            {
+                if (!Regex.IsMatch(passcodePattern, password))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Password does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Invalid password, please try again.");
+                }
+            }
+
+            var admin = new Admin
+            {
+                AdminFname = fname,
+                AdminLname = lname,
+                AdminEmail = email,
+                AdminPasscode = password,
+                MasterAdminId = 1
+            };
+            adminAccess.RegisterAdmin(admin);
+            Console.WriteLine($"Admin \"{admin.AdminFname} {admin.AdminLname}\" added successfully.");
+            ShowLoginMenu();
+        }
+        private static void AdminLogin()
+        {
+            //Testing purpose only, must remove before implementation or I will get fired.
+            var mAdmin = adminAccess.GetMasterAdminSecets();
+            string hintEmail = mAdmin.AdminEmail, hintPassword = mAdmin.AdminPasscode;
+            Console.Clear();
+            Console.WriteLine($"Enter Admin Email (hint: Master admin email: {hintEmail} ):");
+            string email = Console.ReadLine();
+            Console.WriteLine($"\nEnter Admin Password (hint: Master admin password: {hintPassword} ):");
             string password = Console.ReadLine();
 
             var admin = adminAccess.LoginAdmin(email, password);
@@ -511,30 +685,6 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Console.ReadLine();
             }
         }
-
-        private static void UserLogin()
-        {
-            Console.Clear();
-            Console.WriteLine("Enter User Email:");
-            string email = Console.ReadLine();
-            Console.WriteLine("Enter User Password:");
-            string password = Console.ReadLine();
-
-            var user = userAccess.LoginUser(email, password);
-            if (user != null)
-            {
-                currentUserId = user.UserId;
-                isUserLoggedIn = true;
-                Console.WriteLine("Login successful!");
-                ShowUserMenu(user);
-            }
-            else
-            {
-                Console.WriteLine("Invalid credentials. Try again.");
-                Console.ReadLine();
-            }
-        }
-
         private static void ShowAdminMenu(Admin admin)
         {
             int choice = -1;
@@ -546,7 +696,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 choice = ArrowKeySelection(options.ToList(), header);
                 if (choice == 0)
                 {
-                    AddBookMenu();
+                    AddBook();
                 }
                 else if (choice == 1)
                 {
@@ -562,7 +712,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
                 else if (choice == 4)
                 {
-                    SearchBooksMenu();
+                    SearchBooks();
                 }
                 else if (choice == 5)
                 {
@@ -572,7 +722,6 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             while (choice != 5);
         }
-
         private static void ShowMasterAdminMenu(Admin admin)
         {
             int choice = -1;
@@ -584,7 +733,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 choice = ArrowKeySelection(options.ToList(), header);
                 if (choice == 0)
                 {
-                    AddBookMenu();
+                    AddBook();
                 }
                 else if (choice == 1)
                 {
@@ -600,7 +749,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
                 else if (choice == 4)
                 {
-                    SearchBooksMenu();
+                    SearchBooks();
                 }
                 else if (choice == 5)
                 {
@@ -611,39 +760,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             while (choice != 5);
         }
 
-        private static void ShowUserMenu(User user)
-        {
-            int choice = -1;
-            string header = "User Menu:";
-            string[] options = {"Browse Books", "Search for Books", "View Borrowed Books", "Edit User Info", "Logout"};
-            do
-            {
-                choice = ArrowKeySelection(options.ToList(), header);
-                if (choice == 0)
-                {
-                    BrowseBooks();
-                }
-                else if (choice == 1)
-                {
-                    SearchBooksMenu();
-                }
-                else if (choice == 2)
-                {
-                    ViewBorrowedBooks(user);
-                }
-                else if (choice == 3)
-                {
-                    EditUserInfo(user);
-                }
-                else if (choice == 4)
-                {
-                    Logout();
-                    return;
-                }
-            }
-            while (choice != 4);
-        }
 
+        //========== BOOK RELATED OPERATIONS ==========//
         private static void BrowseBooks()
         {
             var books = userAccess.ViewAllBooks();
@@ -653,7 +771,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Console.Clear();
                 string header = "Select a Book to Borrow:";
 
-                int selectedIndex = ArrowKeySelection(bookList.Select(b => $"{b.BookName} by {b.AuthorName} | Available copies: {b.TotalCopies - b.BorrowedCopies}").ToList(), header);
+                int selectedIndex = ArrowKeySelection(bookList.Select(b => $"{b.BookName, -30} | by {b.AuthorName, -20} | Available copies: {b.TotalCopies - b.BorrowedCopies, -1}").ToList(), header);
 
                 var selectedBook = bookList[selectedIndex];
                 userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
@@ -664,7 +782,6 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Console.WriteLine("No books available for browsing.");
             }
         }
-
         private static void ShowRecommendations(Book book)
         {
             var recommendedBooks = userAccess.RecommendedBooks(currentUserId.Value);
@@ -681,43 +798,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
             }
         }
-
-        private static int ArrowKeySelection(List<string> options, string head)
-        {
-            int selectedIndex = 0;
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine(head+"\n\n");
-                for (int i = 0; i < options.Count; i++)
-                {
-                    if (i == selectedIndex)
-                    {
-                        Console.WriteLine($">> {options[i]} <<");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"   {options[i]}");
-                    }
-                }
-                Console.WriteLine("\n\nUse arrow keys to select.");
-                var key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.UpArrow)
-                {
-                    selectedIndex = (selectedIndex > 0)? selectedIndex -1 : options.Count -1;
-                }
-                else if (key.Key == ConsoleKey.DownArrow)
-                {
-                    selectedIndex = (selectedIndex < options.Count -1)? selectedIndex + 1 : 0;
-                }
-                else if (key.Key == ConsoleKey.Enter)
-                {
-                    return selectedIndex;
-                }
-            }
-        }
-
-        private static void AddBookMenu()
+        private static void AddBook()
         {
             Console.Clear();
             Console.WriteLine("Enter Book Name:");
@@ -796,8 +877,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             adminAccess.AddBook(book);
             Console.WriteLine($"\"{bookName}\" has been added successfully.");
         }
-
-        private static void SearchBooksMenu()
+        private static void SearchBooks()
         {
             Console.Clear();
             Console.WriteLine("Enter Book Name or Author Name to Search:");
@@ -810,29 +890,27 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             Console.ReadLine();
         }
-
         private static void ViewAllBooks()
         {
             Console.Clear();
             var books = adminAccess.ViewAllBooks();
+            int counter = 1;
+            string border = new string('=', 83);
+            StringBuilder sb = new StringBuilder();
             foreach (var book in books)
             {
-                Console.WriteLine($"{book.BookName} by {book.AuthorName}");
+                sb.AppendLine($"{counter, -3} | {book.BookName, -30} | {book.AuthorName, -25} | {book.TotalCopies - book.BorrowedCopies}");
+                counter++;
             }
-            Console.ReadLine();
+            Console.WriteLine($"{"No.",-3} | {"Book Name",-30} | {"Author Name", -25} | Available Copies");
+            Console.WriteLine(border);
+            Console.WriteLine(sb.ToString());
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
         }
 
-        private static void ViewAllUsers()
-        {
-            Console.Clear();
-            var users = adminAccess.ViewAllUsers();
-            foreach (var user in users)
-            {
-                Console.WriteLine($"User: {user.Email}");
-            }
-            Console.ReadLine();
-        }
 
+        //========== CATEGORY RELATED OPERATIONS ==========//
         private static void ManageCategories()
         {
             int choice = -1;
@@ -864,7 +942,6 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             while (choice != 3);
         }
-
         private static void AddCategory()
         {
             Console.Clear();
@@ -885,7 +962,6 @@ namespace OOP_EFCore_DB_Project_Implementation
             Console.Clear();
             Console.WriteLine($"Category \"{name}\" has been added successfully.");
         }
-
         private static void UpdateCategory()
         {
             var categories = adminAccess.ViewAllCategories();
@@ -907,40 +983,12 @@ namespace OOP_EFCore_DB_Project_Implementation
 
             adminAccess.UpdateCategory(UpdatedCategory, categories.ToList()[selectedCategoryIndex].CatName);
         }
-
         private static void DeleteCategory()
         {
             var categories = adminAccess.ViewAllCategories();
             string header = "Select a category to delete:";
             int selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
             adminAccess.DeleteCategory(categories.ToList()[selectedCategoryIndex].CatName);
-        }
-
-        private static void ViewBorrowedBooks(User user)
-        {
-            Console.Clear();
-            var borrowedBooks = userAccess.GetCurrentBorrows(user.UserId);
-            foreach (var book in borrowedBooks)
-            {
-                Console.WriteLine($"{book.Book.BookName} by {book.Book.AuthorName}");
-            }
-            Console.ReadLine();
-        }
-
-        private static void EditUserInfo(User user)
-        {
-            Console.Clear();
-            Console.WriteLine("Enter new email:");
-            string newEmail = Console.ReadLine();
-            userAccess.EditInfo(user);
-        }
-
-        private static void Logout()
-        {
-            isUserLoggedIn = false;
-            isAdminLoggedIn = false;
-            currentUserId = null;
-            ShowLoginMenu();
         }
     }
 }

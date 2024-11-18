@@ -76,7 +76,13 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             {
                 try
                 {
-                    _context.Borrows.Entry(borrowToUpdate).CurrentValues.SetValues(borrow);
+                    borrowToUpdate.BorrowDate = borrow.BorrowDate;
+                    borrowToUpdate.ReturnDate = borrow.ReturnDate;
+                    borrowToUpdate.ActualReturnDate = borrow.ActualReturnDate;
+                    borrowToUpdate.Rating = borrow.Rating;
+                    borrowToUpdate.IsReturned = borrow.IsReturned;
+                    borrowToUpdate.BookId = borrow.BookId;
+                    borrowToUpdate.UserId = borrow.UserId;
                     _context.SaveChanges();
                 }
                 catch (Exception ex)
