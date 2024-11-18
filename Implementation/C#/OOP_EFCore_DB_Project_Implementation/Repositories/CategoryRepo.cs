@@ -1,4 +1,5 @@
-﻿using OOP_EFCore_DB_Project_Implementation.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using OOP_EFCore_DB_Project_Implementation.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         }
         public Category GetByName(string name)
         {
-            return _context.Categories.FirstOrDefault(c => c.CatName == name);
+            return _context.Categories.Include(b => b.Books).Where(c => c.CatName == name).FirstOrDefault();
         }
         public void Insert(Category category)
         {
@@ -41,7 +42,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             {
                 try
                 {
-                    _context.Categories.Entry(categoryToUpdate).CurrentValues.SetValues(category);
+                    categoryToUpdate.CatName = category.CatName;
                     _context.SaveChanges();
                 }
                 catch (Exception ex)

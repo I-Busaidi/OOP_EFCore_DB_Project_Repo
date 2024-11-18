@@ -111,9 +111,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             categoryRepo.Insert(category);
         }
 
-        public void UpdateCategory(string catName)
+        public void UpdateCategory(Category category, string catName)
         {
-            var category = categoryRepo.GetByName(catName);
             if (category != null)
             {
                 categoryRepo.UpdateByName(category, catName);

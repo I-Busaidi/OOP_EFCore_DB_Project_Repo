@@ -665,7 +665,6 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
         }
 
-
         private static void ShowRecommendations(Book book)
         {
             var recommendedBooks = userAccess.RecommendedBooks(currentUserId.Value);
@@ -846,12 +845,15 @@ namespace OOP_EFCore_DB_Project_Implementation
                 switch (choice)
                 {
                     case 0:
+                        AddCategory();
                         break;
 
                     case 1:
+                        UpdateCategory();
                         break;
 
                     case 2:
+                        DeleteCategory();
                         break;
 
                     case 3:
@@ -861,6 +863,57 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
             }
             while (choice != 3);
+        }
+
+        private static void AddCategory()
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the new category name:");
+            string name;
+            while(string.IsNullOrEmpty(name = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new category name:");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            adminAccess.AddCategory(new Category
+            {
+                CatName = name
+            });
+
+            Console.Clear();
+            Console.WriteLine($"Category \"{name}\" has been added successfully.");
+        }
+
+        private static void UpdateCategory()
+        {
+            var categories = adminAccess.ViewAllCategories();
+            string header = "Select a category to update:";
+            int selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
+            string newName;
+            Console.Clear();
+            Console.WriteLine($"Enter the new name for category \"{categories.ToList()[selectedCategoryIndex].CatName}\"");
+            while(string.IsNullOrEmpty(newName = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine($"Enter the new name for category \"{categories.ToList()[selectedCategoryIndex].CatName}\"");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+            var UpdatedCategory = new Category
+            {
+                CatName = newName,
+            };
+
+            adminAccess.UpdateCategory(UpdatedCategory, categories.ToList()[selectedCategoryIndex].CatName);
+        }
+
+        private static void DeleteCategory()
+        {
+            var categories = adminAccess.ViewAllCategories();
+            string header = "Select a category to delete:";
+            int selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
+            adminAccess.DeleteCategory(categories.ToList()[selectedCategoryIndex].CatName);
         }
 
         private static void ViewBorrowedBooks(User user)
