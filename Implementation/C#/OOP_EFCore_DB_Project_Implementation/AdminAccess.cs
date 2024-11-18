@@ -184,5 +184,11 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             return userRepo.GetAll();
         }
+
+        //FOR INITIAL SETUP ONLY
+        public void AddBorrow(Borrow borrow)
+        {
+            borrowRepo.Insert(borrow);
+        }
     }
 }

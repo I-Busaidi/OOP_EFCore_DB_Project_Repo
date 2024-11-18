@@ -30,6 +30,12 @@ namespace OOP_EFCore_DB_Project_Implementation
             adminAccess = new AdminAccess(adminRepository, userRepository, bookRepository, categoryRepository, borrowRepository);
             userAccess = new UserAccess(userRepository, bookRepository, borrowRepository, categoryRepository);
 
+            //initial setup:
+            if(!adminRepository.GetAll().Any())
+            {
+                InitialSetup();
+            }
+
             Console.WriteLine("Welcome to the Library Management System!");
             ShowLoginMenu();
         }
@@ -50,7 +56,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             else if (choice == 2)
             {
-                
+                AddUser();
             }
             else if (choice == 3)
             {
@@ -68,7 +74,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             Console.Clear();
             Console.WriteLine("Enter the user email (example@example.com):");
             string email;
-            while(string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(emailPattern, email))
+            while(string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(email, emailPattern))
             {
                 if(!Regex.IsMatch(emailPattern, email))
                 {
@@ -86,7 +92,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             Console.Clear();
             Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
             string password;
-            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(passcodePattern, password))
+            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
             {
                 if (!Regex.IsMatch(passcodePattern, password))
                 {
@@ -117,6 +123,361 @@ namespace OOP_EFCore_DB_Project_Implementation
             };
             userAccess.RegisterUser(user);
             Console.WriteLine($"User \"{user.FName} {user.LName}\" added successfully.");
+            ShowLoginMenu();
+        }
+
+        private static void AddAdmin()
+        {
+            Console.Clear();
+            Console.Write("Enter the first name: ");
+            string fname = Console.ReadLine();
+            Console.Write("\nEnter the last name: ");
+            string lname = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("Enter the admin email (example@example.com):");
+            string email;
+            while (string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(email, emailPattern))
+            {
+                if (!Regex.IsMatch(emailPattern, email))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the admin email (example@example.com):");
+                    Console.WriteLine("Email does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the admin email (example@example.com):");
+                    Console.WriteLine("Invalid email, please try again.");
+                }
+            }
+            Console.Clear();
+            Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+            string password;
+            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
+            {
+                if (!Regex.IsMatch(passcodePattern, password))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Password does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Invalid password, please try again.");
+                }
+            }
+
+            var admin = new Admin
+            {
+                AdminFname = fname,
+                AdminLname = lname,
+                AdminEmail = email,
+                AdminPasscode = password,
+                MasterAdminId = 1
+            };
+            adminAccess.RegisterAdmin(admin);
+            Console.WriteLine($"Admin \"{admin.AdminFname} {admin.AdminLname}\" added successfully.");
+            ShowLoginMenu();
+        }
+
+        private static void InitialSetup()
+        {
+            Console.WriteLine("Welcome, please complete the initial setup to use the system.");
+            Console.WriteLine("Initializing Master Admin:");
+            Console.Write("\nEnter the first name: ");
+            string fname = Console.ReadLine();
+            Console.Write("\nEnter the last name: ");
+            string lname = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("Enter the master admin email (example@example.com):");
+            string email;
+            while (string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(email, emailPattern))
+            {
+                if (!Regex.IsMatch(emailPattern, email))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the admin email (example@example.com):");
+                    Console.WriteLine("Email does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the admin email (example@example.com):");
+                    Console.WriteLine("Invalid email, please try again.");
+                }
+            }
+            Console.Clear();
+            Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+            string password;
+            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
+            {
+                if (!Regex.IsMatch(passcodePattern, password))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Password does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Invalid password, please try again.");
+                }
+            }
+
+            var admin = new Admin
+            {
+                AdminFname = fname,
+                AdminLname = lname,
+                AdminEmail = email,
+                AdminPasscode = password,
+                MasterAdminId = null
+            };
+            adminAccess.RegisterAdmin(admin);
+            Console.WriteLine($"Master Admin \"{admin.AdminFname} {admin.AdminLname}\" added successfully.");
+
+            Console.WriteLine("Initializing testing data.\nPress any key to continue...");
+            Console.ReadKey();
+
+            adminAccess.RegisterAdmin(new Admin
+            {
+                AdminFname = "Alice",
+                AdminLname = "Smith",
+                AdminEmail = "alice.smith@example.com",
+                AdminPasscode = "Password123",
+                MasterAdminId = 1
+            });
+
+            adminAccess.RegisterAdmin(new Admin
+            {
+                AdminFname = "Bob",
+                AdminLname = "Johnson",
+                AdminEmail = "bob.johnson@example.com",
+                AdminPasscode = "SecurePass1",
+                MasterAdminId = 1
+            });
+
+            adminAccess.RegisterAdmin(new Admin
+            {
+                AdminFname = "Clara",
+                AdminLname = "Doe",
+                AdminEmail = "clara.doe@example.com",
+                AdminPasscode = "ClaraPass99",
+                MasterAdminId = 1
+            });
+
+            adminAccess.RegisterAdmin(new Admin
+            {
+                AdminFname = "Daniel",
+                AdminLname = "Brown",
+                AdminEmail = "daniel.brown@example.com",
+                AdminPasscode = "DanBrown!23",
+                MasterAdminId = 1
+            });
+
+            adminAccess.RegisterAdmin(new Admin
+            {
+                AdminFname = "Eva",
+                AdminLname = "Martinez",
+                AdminEmail = "eva.martinez@example.com",
+                AdminPasscode = "EvaMartinez1",
+                MasterAdminId = 1
+            });
+
+            // Insert Users
+            userAccess.RegisterUser(new User
+            {
+                FName = "David",
+                LName = "Brown",
+                Gender = "Male",
+                Email = "david.brown@example.com",
+                Passcode = "DavidPass9"
+            });
+
+            userAccess.RegisterUser(new User
+            {
+                FName = "Emma",
+                LName = "Wilson",
+                Gender = "Female",
+                Email = "emma.wilson@example.com",
+                Passcode = "EmmaPass123"
+            });
+
+            userAccess.RegisterUser(new User
+            {
+                FName = "Frank",
+                LName = "Taylor",
+                Gender = "Male",
+                Email = "frank.taylor@example.com",
+                Passcode = "Taylor1234"
+            });
+
+            userAccess.RegisterUser(new User
+            {
+                FName = "Grace",
+                LName = "Harris",
+                Gender = "Female",
+                Email = "grace.harris@example.com",
+                Passcode = "Grace!998"
+            });
+
+            userAccess.RegisterUser(new User
+            {
+                FName = "Henry",
+                LName = "Clark",
+                Gender = "Male",
+                Email = "henry.clark@example.com",
+                Passcode = "HenryC!654"
+            });
+
+            // Insert Categories
+            adminAccess.AddCategory(new Category
+            {
+                CatName = "Programming",
+                NumOfBooks = 0
+            });
+
+            adminAccess.AddCategory(new Category
+            {
+                CatName = "Databases",
+                NumOfBooks = 0
+            });
+
+            adminAccess.AddCategory(new Category
+            {
+                CatName = "Web Development",
+                NumOfBooks = 0
+            });
+
+            adminAccess.AddCategory(new Category
+            {
+                CatName = "Machine Learning",
+                NumOfBooks = 0
+            });
+
+            adminAccess.AddCategory(new Category
+            {
+                CatName = "Mobile Development",
+                NumOfBooks = 0
+            });
+
+            // Insert Books
+            adminAccess.AddBook(new Book
+            {
+                BookName = "Introduction to C#",
+                AuthorName = "Jane Doe",
+                TotalCopies = 5,
+                BorrowedCopies = 2,
+                BorrowPeriod = 14,
+                CopyPrice = 39.99m,
+                CatId = 1 // Programming category
+            });
+
+            adminAccess.AddBook(new Book
+            {
+                BookName = "Mastering EF Core",
+                AuthorName = "John Smith",
+                TotalCopies = 3,
+                BorrowedCopies = 1,
+                BorrowPeriod = 21,
+                CopyPrice = 49.99m,
+                CatId = 2 // Databases category
+            });
+
+            adminAccess.AddBook(new Book
+            {
+                BookName = "Learning LINQ",
+                AuthorName = "Emily White",
+                TotalCopies = 4,
+                BorrowedCopies = 0,
+                BorrowPeriod = 14,
+                CopyPrice = 29.99m,
+                CatId = 1 // Programming category
+            });
+
+            adminAccess.AddBook(new Book
+            {
+                BookName = "Advanced SQL Queries",
+                AuthorName = "Daniel Green",
+                TotalCopies = 2,
+                BorrowedCopies = 1,
+                BorrowPeriod = 30,
+                CopyPrice = 59.99m,
+                CatId = 2 // Databases category
+            });
+
+            adminAccess.AddBook(new Book
+            {
+                BookName = "Entity Framework Essentials",
+                AuthorName = "Sophia Brown",
+                TotalCopies = 6,
+                BorrowedCopies = 3,
+                BorrowPeriod = 20,
+                CopyPrice = 34.99m,
+                CatId = 1 // Programming category
+            });
+
+            // Insert Borrows
+            adminAccess.AddBorrow(new Borrow
+            {
+                BorrowDate = DateTime.Now.AddDays(-10),
+                ReturnDate = DateTime.Now.AddDays(4),
+                ActualReturnDate = null,
+                IsReturned = false,
+                Rating = 5,
+                UserId = 1, // David
+                BookId = 1  // Introduction to C#
+            });
+
+            adminAccess.AddBorrow(new Borrow
+            {
+                BorrowDate = DateTime.Now.AddDays(-20),
+                ReturnDate = DateTime.Now.AddDays(-5),
+                ActualReturnDate = DateTime.Now.AddDays(-4),
+                IsReturned = true,
+                Rating = 4,
+                UserId = 2, // Emma
+                BookId = 2  // Mastering EF Core
+            });
+
+            adminAccess.AddBorrow(new Borrow
+            {
+                BorrowDate = DateTime.Now.AddDays(-3),
+                ReturnDate = DateTime.Now.AddDays(11),
+                ActualReturnDate = null,
+                IsReturned = false,
+                Rating = null,
+                UserId = 3, // Frank
+                BookId = 3  // Learning LINQ
+            });
+
+            adminAccess.AddBorrow(new Borrow
+            {
+                BorrowDate = DateTime.Now.AddDays(-15),
+                ReturnDate = DateTime.Now.AddDays(-1),
+                ActualReturnDate = DateTime.Now,
+                IsReturned = true,
+                Rating = 5,
+                UserId = 4, // Grace
+                BookId = 4  // Advanced SQL Queries
+            });
+
+            adminAccess.AddBorrow(new Borrow
+            {
+                BorrowDate = DateTime.Now.AddDays(-25),
+                ReturnDate = DateTime.Now.AddDays(-10),
+                ActualReturnDate = DateTime.Now.AddDays(-9),
+                IsReturned = true,
+                Rating = 3,
+                UserId = 5, // Henry
+                BookId = 5  // Entity Framework Essentials
+            });
+
+            Console.WriteLine("Initial setup completed!\nPress any key to continue...");
+            Console.ReadKey();
         }
 
         private static void AdminLogin()
