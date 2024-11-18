@@ -370,7 +370,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 BookName = "Introduction to C#",
                 AuthorName = "Jane Doe",
                 TotalCopies = 5,
-                BorrowedCopies = 2,
+                BorrowedCopies = 1,
                 BorrowPeriod = 14,
                 CopyPrice = 39.99m,
                 CatId = 1 // Programming category
@@ -392,7 +392,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 BookName = "Learning LINQ",
                 AuthorName = "Emily White",
                 TotalCopies = 4,
-                BorrowedCopies = 0,
+                BorrowedCopies = 1,
                 BorrowPeriod = 14,
                 CopyPrice = 29.99m,
                 CatId = 1 // Programming category
@@ -414,7 +414,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 BookName = "Entity Framework Essentials",
                 AuthorName = "Sophia Brown",
                 TotalCopies = 6,
-                BorrowedCopies = 3,
+                BorrowedCopies = 1,
                 BorrowPeriod = 20,
                 CopyPrice = 34.99m,
                 CatId = 1 // Programming category
@@ -731,14 +731,71 @@ namespace OOP_EFCore_DB_Project_Implementation
             int selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
             var selectedCategory = categories.ElementAt(selectedCategoryIndex);
 
+            Console.Clear();
+            Console.WriteLine("Enter the amount of available copies:");
+            int copyAmount;
+            while(!int.TryParse(Console.ReadLine(), out copyAmount) || copyAmount < 1)
+            {
+                Console.Clear();
+                if (copyAmount < 1)
+                {
+                    Console.WriteLine("Enter the amount of available copies:");
+                    Console.WriteLine("Amount must be more than 0, please try again.");
+                }
+                else
+                {
+                    Console.WriteLine("Enter the amount of available copies:");
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+            }
+
+            Console.Clear();
+            Console.WriteLine("Enter the maximum allowed borrowing period in days:");
+            int borrowPeriod;
+            while(!int.TryParse(Console.ReadLine(), out borrowPeriod) || borrowPeriod < 1)
+            {
+                Console.Clear();
+                if (borrowPeriod < 1)
+                {
+                    Console.WriteLine("Enter the maximum allowed borrowing period in days:");
+                    Console.WriteLine("Input must be more than 0, please try again.");
+                }
+                else
+                {
+                    Console.WriteLine("Enter the maximum allowed borrowing period in days:");
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+            }
+
+            Console.Clear();
+            Console.WriteLine($"Enter the price of each copy of the book \"{bookName}\":");
+            decimal price;
+            while (!decimal.TryParse(Console.ReadLine(), out price) || price <= 0)
+            {
+                Console.Clear();
+                if (price <= 0)
+                {
+                    Console.WriteLine($"Enter the price of each copy of the book \"{bookName}\":");
+                    Console.WriteLine("price must be more than 0, please try again.");
+                }
+                else
+                {
+                    Console.WriteLine($"Enter the price of each copy of the book \"{bookName}\":");
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+            }
+
             var book = new Book
             {
                 BookName = bookName,
                 AuthorName = authorName,
+                TotalCopies = copyAmount,
+                BorrowPeriod = borrowPeriod,
+                CopyPrice = price,
                 CatId = selectedCategory.CatId
             };
-
             adminAccess.AddBook(book);
+            Console.WriteLine($"\"{bookName}\" has been added successfully.");
         }
 
         private static void SearchBooksMenu()
