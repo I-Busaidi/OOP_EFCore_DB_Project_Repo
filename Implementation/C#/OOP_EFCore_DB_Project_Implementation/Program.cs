@@ -3,6 +3,7 @@ using OOP_EFCore_DB_Project_Implementation.Repositories;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace OOP_EFCore_DB_Project_Implementation
 {
@@ -15,6 +16,8 @@ namespace OOP_EFCore_DB_Project_Implementation
         private static UserAccess userAccess;
         private static AdminAccess adminAccess;
         private static LibraryAppDbContext dbContext;
+        public static string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+        public static string passcodePattern = @"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$";
 
         static void Main(string[] args)
         {
@@ -34,7 +37,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         private static void ShowLoginMenu()
         {
             string header = "Select an option to login:";
-            string[] loginOptions = { "Admin Login", "User Login", "Exit" };
+            string[] loginOptions = { "Admin Login", "User Login", "Register User", "Exit" };
             int choice = ArrowKeySelection(loginOptions.ToList(), header);
 
             if (choice == 0)
@@ -47,8 +50,73 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             else if (choice == 2)
             {
+                
+            }
+            else if (choice == 3)
+            {
                 return;
             }
+        }
+
+        private static void AddUser()
+        {
+            Console.Clear();
+            Console.Write("Enter the first name: ");
+            string fname = Console.ReadLine();
+            Console.Write("\nEnter the last name: ");
+            string lname = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("Enter the user email (example@example.com):");
+            string email;
+            while(string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(emailPattern, email))
+            {
+                if(!Regex.IsMatch(emailPattern, email))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the user email (example@example.com):");
+                    Console.WriteLine("Email does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter the user email (example@example.com):");
+                    Console.WriteLine("Invalid email, please try again.");
+                }
+            }
+            Console.Clear();
+            Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+            string password;
+            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(passcodePattern, password))
+            {
+                if (!Regex.IsMatch(passcodePattern, password))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Password does not match the above pattern, please try again.");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
+                    Console.WriteLine("Invalid password, please try again.");
+                }
+            }
+
+            Console.Clear();
+            string header = "Select gender:";
+            string[] genderOption = {"Male", "Female"};
+            int choice = ArrowKeySelection(genderOption.ToList(), header);
+
+            var user = new User
+            {
+                FName = fname,
+                LName = lname,
+                Email = email,
+                Passcode = password,
+                Gender = genderOption[choice]
+            };
+            userAccess.RegisterUser(user);
+            Console.WriteLine($"User \"{user.FName} {user.LName}\" added successfully.");
         }
 
         private static void AdminLogin()
