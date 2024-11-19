@@ -551,7 +551,36 @@ namespace OOP_EFCore_DB_Project_Implementation
         }
         private static void EditUserInfo(User user)
         {
-            
+            string header = "Select an editing option: ";
+            string[] options = {"Edit Name","Edit Email","Edit Password","Exit"};
+            int choice = -1;
+
+            do
+            {
+                choice = ArrowKeySelection(options.ToList(), header);
+                switch (choice)
+                {
+                    case 0:
+                        EditUserName(user);
+                        break;
+
+                    case 1:
+                        EditUserEmail(user);
+                        break;
+
+                    case 2:
+                        EditUserPasscode(user);
+                        break;
+
+                    case 3:
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            while (choice != 3);
+
         }
         private static void EditUserName(User user)
         {
@@ -586,11 +615,76 @@ namespace OOP_EFCore_DB_Project_Implementation
         }
         private static void EditUserEmail(User user)
         {
+            Console.Clear();
+            Console.WriteLine("Enter the new email for user (example@example.com):");
+            string email;
+            while (string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(email, emailPattern))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new email for user (example@example.com):");
+                if(!Regex.IsMatch(email, emailPattern))
+                {
+                    Console.WriteLine("Email does not match the required pattern, please try again.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+            }
 
+            userAccess.EditInfo(new User
+            {
+                UserId = user.UserId,
+                FName = user.FName,
+                LName = user.LName,
+                Email = email,
+                Passcode = user.Passcode,
+                Gender = user.Gender,
+            });
         }
         private static void EditUserPasscode(User user)
         {
+            Console.Clear();
+            Console.WriteLine("Enter the new password for user (8 characters, 1 letter and 1 number at least):");
+            string password;
+            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new password for user (8 characters, 1 letter and 1 number at least):");
+                if (!Regex.IsMatch(password, passcodePattern))
+                {
+                    Console.WriteLine("Password does not match the required pattern, please try again.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+            }
 
+            userAccess.EditInfo(new User
+            {
+                UserId = user.UserId,
+                FName = user.FName,
+                LName = user.LName,
+                Email = user.Email,
+                Passcode = password,
+                Gender = user.Gender,
+            });
+        }
+        private static void DeleteUser(User user)
+        {
+            string header = $"Confirm removal of user: {user.FName + " " + user.LName}? ";
+            string[] options = {"Yes","No"};
+            int choice = ArrowKeySelection(options.ToList(), header);
+
+            if (choice == 0)
+            {
+                adminAccess.RemoveUser(user.UserId);
+            }
+            else
+            {
+                Console.WriteLine("User removal has been cancelled.");
+            }
         }
 
 
@@ -759,6 +853,139 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             while (choice != 5);
         }
+        private static void DeleteAdmin(Admin admin)
+        {
+            string header = $"Confirm removal of admin: {admin.AdminFname + " " + admin.AdminLname}?";
+            string[] options = { "Yes", "No" };
+            int choice = ArrowKeySelection(options.ToList(), header);
+
+            if (choice == 0)
+            {
+                adminAccess.RemoveAdmin(admin.AdminId);
+            }
+            else
+            {
+                Console.WriteLine("Admin removal has been cancelled.");
+            }
+        }
+        private static void EditAdminInfo(Admin admin)
+        {
+            string header = "Select an editing option: ";
+            string[] options = { "Edit Name", "Edit Email", "Edit Password", "Exit" };
+            int choice = -1;
+
+            do
+            {
+                choice = ArrowKeySelection(options.ToList(), header);
+                switch (choice)
+                {
+                    case 0:
+                        EditAdminName(admin);
+                        break;
+
+                    case 1:
+                        EditAdminEmail(admin);
+                        break;
+
+                    case 2:
+                        EditAdminPasscode(admin);
+                        break;
+
+                    case 3:
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            while (choice != 3);
+        }
+        private static void EditAdminName(Admin admin)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the new first name for admin:");
+            string newFname;
+            while (string.IsNullOrEmpty(newFname = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new first name for admin:");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            Console.WriteLine("Enter the new last name for admin:");
+            string newLname;
+            while (string.IsNullOrEmpty(newLname = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new last name for admin:");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            adminAccess.UpdateAdmin(new Admin
+            {
+                AdminEmail = admin.AdminEmail,
+                AdminPasscode = admin.AdminPasscode,
+                MasterAdminId = admin.MasterAdminId,
+                AdminFname = newFname,
+                AdminLname = newLname
+            });
+        }
+        private static void EditAdminEmail(Admin admin)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the new email for admin (example@example.com):");
+            string email;
+            while (string.IsNullOrEmpty(email = Console.ReadLine()) || !Regex.IsMatch(email, emailPattern))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new email for admin (example@example.com):");
+                if (!Regex.IsMatch(email, emailPattern))
+                {
+                    Console.WriteLine("Email does not match the required pattern, please try again.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+            }
+
+            adminAccess.UpdateAdmin(new Admin
+            {
+                AdminEmail = email,
+                AdminPasscode = admin.AdminPasscode,
+                MasterAdminId = admin.MasterAdminId,
+                AdminFname = admin.AdminFname,
+                AdminLname = admin.AdminLname
+            });
+        }
+        private static void EditAdminPasscode(Admin admin)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the new password for admin (8 characters, 1 letter and 1 number at least):");
+            string password;
+            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new password for admin (8 characters, 1 letter and 1 number at least):");
+                if (!Regex.IsMatch(password, passcodePattern))
+                {
+                    Console.WriteLine("Password does not match the required pattern, please try again.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+            }
+
+            adminAccess.UpdateAdmin(new Admin
+            {
+                AdminEmail = admin.AdminEmail,
+                AdminPasscode = password,
+                MasterAdminId = admin.MasterAdminId,
+                AdminFname = admin.AdminFname,
+                AdminLname = admin.AdminLname
+            });
+        }
 
 
         //========== BOOK RELATED OPERATIONS ==========//
@@ -786,7 +1013,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             var recommendedBooks = userAccess.RecommendedBooks(currentUserId.Value);
             Console.Clear();
-            string header = "Recommended Books:";
+            string header = "Recommended books based on your selection:";
 
             var random = new Random();
             var randomBooks = recommendedBooks.OrderBy(x => random.Next()).Take(5).ToList();

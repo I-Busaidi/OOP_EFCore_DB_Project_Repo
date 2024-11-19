@@ -127,8 +127,6 @@ namespace OOP_EFCore_DB_Project_Implementation
             return borrowRepo.GetUserBorrowsById(userId); 
         }
 
-
-
         public IEnumerable<Book> RecommendedBooks(int uId)
         {
             var userBorrows = borrowRepo.GetUserBorrowsById(uId);
