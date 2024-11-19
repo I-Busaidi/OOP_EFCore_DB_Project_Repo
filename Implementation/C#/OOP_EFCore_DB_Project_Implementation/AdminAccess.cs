@@ -42,6 +42,11 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
         }
 
+        public IEnumerable<Admin> GetAllAdmins()
+        {
+            return adminRepo.GetAll().ToList();
+        }
+
         public Admin GetMasterAdminSecets() //FOR TESTING ONLY
         {
             return adminRepo.GetAll().FirstOrDefault(a => a.MasterAdminId == null);
