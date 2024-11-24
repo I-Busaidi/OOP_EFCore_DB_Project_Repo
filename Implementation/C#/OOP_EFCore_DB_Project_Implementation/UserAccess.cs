@@ -32,6 +32,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("This user email is already in use.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -44,6 +46,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("This user email is already in use.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -86,16 +90,22 @@ namespace OOP_EFCore_DB_Project_Implementation
                     else
                     {
                         Console.WriteLine("User has overdue books that must be returned first.");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey();
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Used is currently borrowing this book already.");
+                    Console.WriteLine("User is currently borrowing this book already.");
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
                 }
             }
             else
             {
                 Console.WriteLine("No copies available for borrowing.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 

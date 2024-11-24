@@ -39,6 +39,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("Admin email already exists.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -66,6 +68,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("admin with this email already exists.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -89,12 +93,23 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("A book with this name already exists.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
         public void UpdateBook(string name, Book book)
         {
-            bookRepo.UpdateByName(book, name);
+            if (bookRepo.GetByName(book.BookName) == null || bookRepo.GetByName(book.BookName).BookId == book.BookId)
+            {
+                bookRepo.UpdateByName(book, name);
+            }
+            else
+            {
+                Console.WriteLine("A book with this name already exists.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+            }
         }
 
         public void DeleteBook(string name)
@@ -113,6 +128,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("Book not found or currently borrowed.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -139,6 +156,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("Category has books or not found.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -151,6 +170,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("Email is already in use.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -164,6 +185,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("User not found, or has pending returns.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -176,6 +199,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 Console.WriteLine("This user email is already in use.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 

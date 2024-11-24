@@ -294,7 +294,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 ReturnDate = DateTime.Now.AddDays(4),
                 ActualReturnDate = null,
                 IsReturned = false,
-                Rating = 5,
+                Rating = null,
                 UserId = 1, // David
                 BookId = 1  // Introduction to C#
             });
@@ -892,7 +892,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
                 else if (choice == 4)
                 {
-                    SearchBooks();
+                    SearchBooks(true);
                 }
                 else if(choice == 5)
                 {
@@ -936,7 +936,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
                 else if (choice == 4)
                 {
-                    SearchBooks();
+                    SearchBooks(true);
                 }
                 else if(choice == 5)
                 {
@@ -1148,8 +1148,16 @@ namespace OOP_EFCore_DB_Project_Implementation
                 else
                 {
                     var selectedBook = bookList[selectedIndex];
-                    userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
-                    ShowRecommendations(selectedBook);
+                    string headerConf = $"You are borrowing \"{selectedBook.BookName} by {selectedBook.AuthorName}\".\n" +
+                        $"book must be returned on or before {DateTime.Now.AddDays(selectedBook.BorrowPeriod)}.\n" +
+                        $"Confirm?";
+                    string[] options = {"Yes", "No"};
+                    int choice = ArrowKeySelection(options.ToList(), headerConf);
+                    if(choice == 0)
+                    {
+                        userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
+                        ShowRecommendations(selectedBook);
+                    }
                 }
             }
             else
@@ -1170,7 +1178,15 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (selectedBookIndex >= 0 && selectedBookIndex < randomBooks.Count)
             {
                 var selectedBook = randomBooks[selectedBookIndex];
-                userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
+                string headerConf = $"You are borrowing \"{selectedBook.BookName} by {selectedBook.AuthorName}\".\n" +
+                    $"book must be returned on or before {DateTime.Now.AddDays(selectedBook.BorrowPeriod)}.\n" +
+                    $"Confirm?";
+                string[] options = { "Yes", "No" };
+                int choice = ArrowKeySelection(options.ToList(), headerConf);
+                if (choice == 0)
+                {
+                    userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
+                }
             }
             else
             {
@@ -1263,18 +1279,54 @@ namespace OOP_EFCore_DB_Project_Implementation
             adminAccess.AddBook(book);
             Console.WriteLine($"\"{bookName}\" has been added successfully.");
         }
-        private static void SearchBooks()
+        private static void SearchBooks(bool isAdmin = false)
         {
             Console.Clear();
             Console.WriteLine("Enter Book Name or Author Name to Search:");
             string searchTerm = Console.ReadLine();
-
+            Console.Clear();
             var books = userAccess.SearchBooks(searchTerm);
-            foreach (var book in books)
+            if (isAdmin)
             {
-                Console.WriteLine($"{book.BookName} by {book.AuthorName}");
+                int counter = 1;
+                string border = new string('=', 83);
+                Console.WriteLine($"{"No.",-3} | {"Book Name",-30} | {"Author Name",-25} | Available Copies");
+                Console.WriteLine(border);
+                foreach (var book in books)
+                {
+                    Console.WriteLine($"{counter, -3} | {book.BookName, -30} | {book.AuthorName, -25} | {book.TotalCopies - book.BorrowedCopies}");
+                }
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
-            Console.ReadLine();
+
+            else
+            {
+                var bookList = books.ToList();
+                string header = "Select a Book to Borrow:";
+
+                int selectedIndex = ArrowKeySelection(bookList.Select(b => $"{b.BookName,-30} | by {b.AuthorName,-20} | Available copies: {b.TotalCopies - b.BorrowedCopies,-1}").ToList(), header);
+                if (selectedIndex == -1)
+                {
+                    Console.WriteLine("Book borrowing cancelled.\nPress any key to continue...");
+                    Console.ReadKey();
+                    return;
+                }
+                else
+                {
+                    var selectedBook = bookList[selectedIndex];
+                    string headerConf = $"You are borrowing \"{selectedBook.BookName} by {selectedBook.AuthorName}\".\n" +
+                        $"book must be returned on or before {DateTime.Now.AddDays(selectedBook.BorrowPeriod)}.\n" +
+                        $"Confirm?";
+                    string[] options = { "Yes", "No" };
+                    int choice = ArrowKeySelection(options.ToList(), headerConf);
+                    if (choice == 0)
+                    {
+                        userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
+                        ShowRecommendations(selectedBook);
+                    }
+                }
+            }
         }
         private static void ViewAllBooks()
         {
