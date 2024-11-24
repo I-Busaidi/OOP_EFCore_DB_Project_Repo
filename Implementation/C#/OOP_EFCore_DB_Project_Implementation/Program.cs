@@ -590,7 +590,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             choice = -1;
             header = "User Menu:";
-            options = new string[] { "Browse Books", "Search for Books", "View Borrowed Books", "Return Book", "Edit User Info", "Logout" };
+            options = new string[] { "Browse Books", "Search for Books", "Filter Books By Category", "View Borrowed Books", "Return Book", "Edit User Info", "Logout" };
             do
             {
                 choice = ArrowKeySelection(options.ToList(), header);
@@ -604,22 +604,26 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
                 else if (choice == 2)
                 {
-                    ViewBorrowedBooks(user);
+                    ViewBooksByCategory();
                 }
                 else if (choice == 3)
                 {
-                    ReturnBook(user);
+                    ViewBorrowedBooks(user);
                 }
                 else if (choice == 4)
                 {
-                    EditUserInfo(user);
+                    ReturnBook(user);
                 }
                 else if (choice == 5)
+                {
+                    EditUserInfo(user);
+                }
+                else
                 {
                     Logout();
                 }
             }
-            while (choice != 5);
+            while (choice != 6 || choice != -1);
         }
         private static void ViewBorrowedBooks(User user)
         {
@@ -919,7 +923,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             int choice = -1;
             string header = "Admin Menu:";
-            string[] options = { "Add Book", "View All Books", "View Users", "Manage Categories", "Search for Books", "Manage Users", "Manage Books", "Logout" };
+            string[] options = { "Add Book", "View All Books", "View Books By Category", "View Users", "Manage Categories", "Search for Books", "Manage Users", "Manage Books", "Logout" };
 
             do
             {
@@ -934,21 +938,25 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
                 else if (choice == 2)
                 {
-                    ViewAllUsers();
+                    ViewBooksByCategory();
                 }
                 else if (choice == 3)
                 {
-                    ManageCategories();
+                    ViewAllUsers();
                 }
                 else if (choice == 4)
                 {
+                    ManageCategories();
+                }
+                else if (choice == 5)
+                {
                     SearchBooks(true);
                 }
-                else if(choice == 5)
+                else if(choice == 6)
                 {
                     ManageUser();
                 }
-                else if(choice == 6)
+                else if(choice == 7)
                 {
                     ManageBook();
                 }
@@ -957,13 +965,13 @@ namespace OOP_EFCore_DB_Project_Implementation
                     Logout();
                 }
             }
-            while (choice != 5);
+            while (choice != 8 || choice != -1);
         }
         private static void ShowMasterAdminMenu(Admin admin)
         {
             int choice = -1;
             string header = "Master Admin Menu:";
-            string[] options = { "Add Book", "View All Books", "View Users", "Manage Categories", "Search for Books", "Manage Users", "Manage Admins", "Manage Books", "Logout" };
+            string[] options = { "Add Book", "View All Books", "View Books By Category", "View Users", "Manage Categories", "Search for Books", "Manage Users", "Manage Admins", "Manage Books", "Logout" };
 
             do
             {
@@ -978,25 +986,29 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
                 else if (choice == 2)
                 {
-                    ViewAllUsers();
+                    ViewBooksByCategory();
                 }
                 else if (choice == 3)
                 {
-                    ManageCategories();
+                    ViewAllUsers();
                 }
                 else if (choice == 4)
                 {
-                    SearchBooks(true);
+                    ManageCategories();
                 }
-                else if(choice == 5)
+                else if (choice == 5)
                 {
-                    ManageUser();
+                    SearchBooks(true);
                 }
                 else if(choice == 6)
                 {
+                    ManageUser();
+                }
+                else if(choice == 7)
+                {
                     ManageAdmin();
                 }
-                else if( choice == 7)
+                else if( choice == 8)
                 {
                     ManageBook();
                 }
@@ -1006,7 +1018,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                     return;
                 }
             }
-            while (choice != 8 || choice != -1);
+            while (choice != 9 || choice != -1);
         }
         private static void DeleteAdmin(Admin admin)
         {
@@ -1262,6 +1274,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             {
                 Console.WriteLine("Book addition cancelled.\nPress any key to continue...");
                 Console.ReadKey();
+                return;
             }
             var selectedCategory = categories.ElementAt(selectedCategoryIndex);
 
@@ -1775,6 +1788,34 @@ namespace OOP_EFCore_DB_Project_Implementation
                     Console.ReadKey();
                 }
             }
+        }
+        private static void ViewBooksByCategory()
+        {
+            var categories = adminAccess.ViewAllCategories();
+            string header = "Select a category for the book:";
+            int selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
+
+            if (selectedCategoryIndex == -1)
+            {
+                Console.WriteLine("View books by category cancelled.\nPress any key to continue...");
+                Console.ReadKey();
+            }
+            var selectedCategory = categories.ElementAt(selectedCategoryIndex);
+
+            var books = userAccess.FilterBooksByCategory(selectedCategory.CatName);
+            int counter = 1;
+            string border = new string('=', 83);
+            StringBuilder sb = new StringBuilder();
+            foreach (var book in books)
+            {
+                sb.AppendLine($"{counter,-3} | {book.BookName,-30} | {book.AuthorName,-25} | {book.TotalCopies - book.BorrowedCopies}");
+                counter++;
+            }
+            Console.WriteLine($"{"No.",-3} | {"Book Name",-30} | {"Author Name",-25} | Available Copies");
+            Console.WriteLine(border);
+            Console.WriteLine(sb.ToString());
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
         }
     }
 }
