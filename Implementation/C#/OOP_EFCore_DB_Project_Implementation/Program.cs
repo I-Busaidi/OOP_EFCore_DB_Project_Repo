@@ -1135,6 +1135,200 @@ namespace OOP_EFCore_DB_Project_Implementation
             Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
+        private static void EditBookInfo(Book book)
+        {
+            string header = "Select an editing option: ";
+            string[] options = { "Edit Name", "Edit Author Name", "Edit Price", "Edit Borrow Period", "Add Copies", "Exit" };
+            int choice = -1;
+
+            do
+            {
+                choice = ArrowKeySelection(options.ToList(), header);
+                switch (choice)
+                {
+                    case 0:
+                        EditBookName(book);
+                        break;
+
+                    case 1:
+                        EditBookAuthorName(book);
+                        break;
+
+                    case 2:
+                        EditBookPrice(book);
+                        break;
+
+                    case 3:
+                        EditBorrowPeriod(book);
+                        break;
+
+                    case 4:
+                        AddCopies(book);
+                        break;
+
+                    case 5:
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            while (choice != 5);
+        }
+        private static void EditBookName(Book book)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the new name for the book: ");
+            string bName;
+            while(string.IsNullOrEmpty(bName = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new name for the book: ");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            adminAccess.UpdateBook(book.BookName, new Book
+            {
+                BookName = bName,
+                AuthorName = book.AuthorName,
+                BorrowedCopies = book.BorrowedCopies,
+                BorrowPeriod = book.BorrowPeriod,
+                TotalCopies = book.TotalCopies,
+                CopyPrice = book.CopyPrice,
+                CatId = book.CatId,
+            });
+        }
+        private static void EditBookAuthorName(Book book)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the new author name for the book: ");
+            string newAuthorName;
+            while (string.IsNullOrEmpty(newAuthorName = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new author name for the book: ");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            adminAccess.UpdateBook(book.BookName, new Book
+            {
+                BookName = book.BookName,
+                AuthorName = newAuthorName,
+                BorrowedCopies = book.BorrowedCopies,
+                BorrowPeriod = book.BorrowPeriod,
+                TotalCopies = book.TotalCopies,
+                CopyPrice = book.CopyPrice,
+                CatId = book.CatId,
+            });
+        }
+        private static void EditBookPrice(Book book)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the new price for the book: ");
+            decimal newPrice;
+            while (!decimal.TryParse(Console.ReadLine(), out newPrice) || newPrice <= 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new price for the book: ");
+                if (newPrice <= 0)
+                {
+                    Console.WriteLine("Price must be greater than 0");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+            }
+            adminAccess.UpdateBook(book.BookName, new Book
+            {
+                BookName = book.BookName,
+                AuthorName = book.AuthorName,
+                BorrowedCopies = book.BorrowedCopies,
+                BorrowPeriod = book.BorrowPeriod,
+                TotalCopies = book.TotalCopies,
+                CopyPrice = newPrice,
+                CatId = book.CatId,
+            });
+        }
+        private static void EditBorrowPeriod(Book book)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the new allowed borrow period for the book: ");
+            int newPeriod;
+            while (!int.TryParse(Console.ReadLine(), out newPeriod) || newPeriod <= 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the new allowed borrow period for the book: ");
+                if (newPeriod <= 0)
+                {
+                    Console.WriteLine("Allowed borrow period must be greater than 0");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+            }
+            adminAccess.UpdateBook(book.BookName, new Book
+            {
+                BookName = book.BookName,
+                AuthorName = book.AuthorName,
+                BorrowedCopies = book.BorrowedCopies,
+                BorrowPeriod = newPeriod,
+                TotalCopies = book.TotalCopies,
+                CopyPrice = book.CopyPrice,
+                CatId = book.CatId,
+            });
+        }
+        private static void AddCopies(Book book)
+        {
+            Console.Clear();
+            Console.WriteLine("Enter the number of copies to add for the book: ");
+            int addedCopies;
+            while (!int.TryParse(Console.ReadLine(), out addedCopies) || addedCopies < 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the number of copies to add for the book: ");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            adminAccess.UpdateBook(book.BookName, new Book
+            {
+                BookName = book.BookName,
+                AuthorName = book.AuthorName,
+                BorrowedCopies = book.BorrowedCopies,
+                BorrowPeriod = book.BorrowPeriod,
+                TotalCopies = book.TotalCopies + addedCopies,
+                CopyPrice = book.CopyPrice,
+                CatId = book.CatId,
+            });
+        }
+        private static void DeleteBook(Book book)
+        {
+            string header = $"Confirm removal of book: {book.BookName}? ";
+            string[] options = { "Yes", "No" };
+            int choice = ArrowKeySelection(options.ToList(), header);
+
+            if (choice == 0)
+            {
+                adminAccess.DeleteBook(book.BookName);
+            }
+            else
+            {
+                Console.WriteLine("Book removal has been cancelled.");
+            }
+        }
+        private static void ReturnBook(User user)
+        {
+            var borrows = userAccess.GetCurrentBorrows(user.UserId);
+            if (borrows == null)
+            {
+                Console.WriteLine("No books currently borrowed by this user.");
+            }
+            else
+            {
+
+            }
+        }
 
 
         //========== CATEGORY RELATED OPERATIONS ==========//
