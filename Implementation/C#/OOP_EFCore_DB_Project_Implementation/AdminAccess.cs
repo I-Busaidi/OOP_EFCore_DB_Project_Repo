@@ -56,7 +56,17 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         public void RemoveAdmin(int id)
         {
-            adminRepo.DeleteById(id);
+            var mAdmins = adminRepo.GetAll().Where(a => a.MasterAdminId ==null).ToList();
+            if (mAdmins.Count == 1)
+            {
+                Console.WriteLine("Cannot remove the last remaining master admin.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+            }
+            else
+            {
+                adminRepo.DeleteById(id);
+            }
         }
 
         public void UpdateAdmin(Admin admin)

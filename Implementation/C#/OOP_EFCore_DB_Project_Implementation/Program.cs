@@ -407,6 +407,37 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
             }
         }
+        private static string HidePassword()
+        {
+            string password = "";
+            ConsoleKeyInfo info = Console.ReadKey(true);
+            while (info.Key != ConsoleKey.Enter)
+            {
+                if (info.Key != ConsoleKey.Backspace)
+                {
+                    Console.Write("*");
+                    password += info.KeyChar;
+                }
+                else if (info.Key == ConsoleKey.Backspace)
+                {
+                    if (!string.IsNullOrEmpty(password))
+                    {
+                        // remove one character from the list of password characters
+                        password = password.Substring(0, password.Length - 1);
+                        // get the location of the cursor
+                        int pos = Console.CursorLeft;
+                        // move the cursor to the left by one character
+                        Console.SetCursorPosition(pos - 1, Console.CursorTop);
+                        // replace it with space
+                        Console.Write(" ");
+                        // move the cursor to the left by one character again
+                        Console.SetCursorPosition(pos - 1, Console.CursorTop);
+                    }
+                }
+                info = Console.ReadKey(true);
+            }
+            return password;
+        }
 
 
         //========== USER RELATED OPERATIONS ==========//
@@ -437,8 +468,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             Console.Clear();
             Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
-            string password;
-            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
+            string password = HidePassword();
+            while (string.IsNullOrEmpty(password) || !Regex.IsMatch(password, passcodePattern))
             {
                 if (!Regex.IsMatch(passcodePattern, password))
                 {
@@ -452,6 +483,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                     Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
                     Console.WriteLine("Invalid password, please try again.");
                 }
+                password = HidePassword();
             }
 
             Console.Clear();
@@ -503,7 +535,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             Console.WriteLine("Enter User Email:");
             string email = Console.ReadLine();
             Console.WriteLine("Enter User Password:");
-            string password = Console.ReadLine();
+            string password = HidePassword();
 
             var user = userAccess.LoginUser(email, password);
             if (user != null)
@@ -802,8 +834,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             Console.Clear();
             Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
-            string password;
-            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
+            string password = HidePassword();
+            while (string.IsNullOrEmpty(password) || !Regex.IsMatch(password, passcodePattern))
             {
                 if (!Regex.IsMatch(passcodePattern, password))
                 {
@@ -817,6 +849,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                     Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
                     Console.WriteLine("Invalid password, please try again.");
                 }
+                password = HidePassword();
             }
 
             var admin = new Admin
@@ -840,7 +873,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             Console.WriteLine($"Enter Admin Email (hint: Master admin email: {hintEmail} ):");
             string email = Console.ReadLine();
             Console.WriteLine($"\nEnter Admin Password (hint: Master admin password: {hintPassword} ):");
-            string password = Console.ReadLine();
+            string password = HidePassword(); ;
 
             var admin = adminAccess.LoginAdmin(email, password);
             if (admin != null)
