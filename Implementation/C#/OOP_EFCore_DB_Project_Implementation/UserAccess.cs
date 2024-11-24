@@ -99,13 +99,14 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
         }
 
-        public void ReturnBook(int userId, int bookId)
+        public void ReturnBook(int userId, int bookId, int rating)
         {
             var borrow = borrowRepo.GetAll().FirstOrDefault(b => b.UserId == userId && b.BookId == bookId && !b.IsReturned);
             if (borrow != null)
             {
                 borrow.IsReturned = true;
                 borrow.ActualReturnDate = DateTime.Now;
+                borrow.Rating = rating;
                 borrowRepo.UpdateById(borrow, borrow.BorrowId);
 
                 var book = bookRepo.GetAll().FirstOrDefault(b => b.BookId == bookId);

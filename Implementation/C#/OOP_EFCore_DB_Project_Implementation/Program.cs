@@ -387,7 +387,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                         Console.WriteLine($"   {options[i]}");
                     }
                 }
-                Console.WriteLine("\n\nUse arrow keys to select.");
+                Console.WriteLine("\n\nUse arrow keys to select. or 'Esc' to exit menu");
                 var key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.UpArrow)
                 {
@@ -400,6 +400,10 @@ namespace OOP_EFCore_DB_Project_Implementation
                 else if (key.Key == ConsoleKey.Enter)
                 {
                     return selectedIndex;
+                }
+                else if (key.Key == ConsoleKey.Escape)
+                {
+                    return -1;
                 }
             }
         }
@@ -454,17 +458,25 @@ namespace OOP_EFCore_DB_Project_Implementation
             string header = "Select gender:";
             string[] genderOption = {"Male", "Female"};
             int choice = ArrowKeySelection(genderOption.ToList(), header);
-
-            var user = new User
+            if (choice == -1)
             {
-                FName = fname,
-                LName = lname,
-                Email = email,
-                Passcode = password,
-                Gender = genderOption[choice]
-            };
-            userAccess.RegisterUser(user);
-            Console.WriteLine($"User \"{user.FName} {user.LName}\" added successfully.");
+                Console.WriteLine("Returning to login menu.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+            }
+            else
+            {
+                var user = new User
+                {
+                    FName = fname,
+                    LName = lname,
+                    Email = email,
+                    Passcode = password,
+                    Gender = genderOption[choice]
+                };
+                userAccess.RegisterUser(user);
+                Console.WriteLine($"User \"{user.FName} {user.LName}\" added successfully.");
+            }
             ShowLoginMenu();
         }
         private static void ViewAllUsers()
@@ -747,8 +759,15 @@ namespace OOP_EFCore_DB_Project_Implementation
             {
                 string header = "Select a user from the list that matched the name: ";
                 int selectedIndex = ArrowKeySelection(usersList.Select(u => $"{u.FName + " " + u.LName, -30} | Email: {u.Email}").ToList(), header);
-                var selectedUser = usersList[selectedIndex];
-                EditUserInfo(selectedUser);
+                if (selectedIndex == -1)
+                {
+                    return;
+                }
+                else
+                {
+                    var selectedUser = usersList[selectedIndex];
+                    EditUserInfo(selectedUser);
+                }
             }
         }
 
@@ -881,7 +900,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 {
                     ManageBook();
                 }
-                else if (choice == 7)
+                else
                 {
                     Logout();
                     return;
@@ -930,7 +949,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 {
                     ManageBook();
                 }
-                else if (choice == 8)
+                else
                 {
                     Logout();
                     return;
@@ -981,6 +1000,8 @@ namespace OOP_EFCore_DB_Project_Implementation
                         break;
 
                     case 4:
+                    case -1:
+                        choice = 4;
                         break;
 
                     default:
@@ -1117,10 +1138,18 @@ namespace OOP_EFCore_DB_Project_Implementation
                 string header = "Select a Book to Borrow:";
 
                 int selectedIndex = ArrowKeySelection(bookList.Select(b => $"{b.BookName, -30} | by {b.AuthorName, -20} | Available copies: {b.TotalCopies - b.BorrowedCopies, -1}").ToList(), header);
-
-                var selectedBook = bookList[selectedIndex];
-                userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
-                ShowRecommendations(selectedBook);
+                if (selectedIndex == -1)
+                {
+                    Console.WriteLine("Book borrowing cancelled.\nPress any key to continue...");
+                    Console.ReadKey();
+                    return;
+                }
+                else
+                {
+                    var selectedBook = bookList[selectedIndex];
+                    userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
+                    ShowRecommendations(selectedBook);
+                }
             }
             else
             {
@@ -1142,6 +1171,11 @@ namespace OOP_EFCore_DB_Project_Implementation
                 var selectedBook = randomBooks[selectedBookIndex];
                 userAccess.BorrowBook(currentUserId.Value, selectedBook.BookId);
             }
+            else
+            {
+                Console.WriteLine("Returning to menu.\nPress any key to continue...");
+                Console.ReadKey();
+            }
         }
         private static void AddBook()
         {
@@ -1154,6 +1188,12 @@ namespace OOP_EFCore_DB_Project_Implementation
             var categories = adminAccess.ViewAllCategories();
             string header = "Select a category for the book:";
             int selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
+
+            if (selectedCategoryIndex == -1)
+            {
+                Console.WriteLine("Book addition cancelled.\nPress any key to continue...");
+                Console.ReadKey();
+            }
             var selectedCategory = categories.ElementAt(selectedCategoryIndex);
 
             Console.Clear();
@@ -1289,6 +1329,8 @@ namespace OOP_EFCore_DB_Project_Implementation
                         break;
 
                     case 6:
+                    case -1:
+                        choice = 6;
                         break;
 
                     default:
@@ -1451,8 +1493,29 @@ namespace OOP_EFCore_DB_Project_Implementation
                 var borrowsList = borrows.ToList();
                 string header = "Select a book to return: ";
                 int selectedIndex = ArrowKeySelection(borrowsList.Select(b => $"{b.Book.BookName, -30} | Due Date: {b.ReturnDate, -30} | Days left: {(b.ReturnDate - DateTime.Now).Days}").ToList(), header);
+                if (selectedIndex == -1)
+                {
+                    Console.WriteLine("Cancelling return.\nPress any key to continue...");
+                    Console.ReadKey();
+                    return;
+                }
                 var selectedBorrow = borrowsList[selectedIndex];
-                userAccess.ReturnBook(user.UserId, selectedBorrow.BookId);
+                Console.WriteLine($"Rate the book \"{selectedBorrow.Book.BookName}\" out of 5: ");
+                int rating = 0;
+                while(!int.TryParse(Console.ReadLine(), out rating) || rating < 0 || rating > 5)
+                {
+                    Console.Clear();
+                    Console.WriteLine($"Rate the book \"{selectedBorrow.Book.BookName}\" out of 5: ");
+                    if (rating < 0 || rating > 5)
+                    {
+                        Console.WriteLine("Rating must be from 0 to 5.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input, please try again.");
+                    }
+                }
+                userAccess.ReturnBook(user.UserId, selectedBorrow.BookId, rating);
                 ShowRecommendations(selectedBorrow.Book);
             }
         }
@@ -1481,6 +1544,12 @@ namespace OOP_EFCore_DB_Project_Implementation
             {
                 string header = "Select a book from the list that matched the name: ";
                 int selectedIndex = ArrowKeySelection(booksList.Select(b => $"{b.BookName,-30} | By: {b.AuthorName}").ToList(), header);
+                if (selectedIndex == -1)
+                {
+                    Console.WriteLine("Returning to menu.\nPress any key to continue...");
+                    Console.ReadKey();
+                    return;
+                }
                 var selectedBook = booksList[selectedIndex];
                 EditBookInfo(selectedBook);
             }
@@ -1512,6 +1581,8 @@ namespace OOP_EFCore_DB_Project_Implementation
                         break;
 
                     case 3:
+                    case -1:
+                        choice = 3;
                         break;
                     default:
                         break;
@@ -1544,28 +1615,52 @@ namespace OOP_EFCore_DB_Project_Implementation
             var categories = adminAccess.ViewAllCategories();
             string header = "Select a category to update:";
             int selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
-            string newName;
-            Console.Clear();
-            Console.WriteLine($"Enter the new name for category \"{categories.ToList()[selectedCategoryIndex].CatName}\"");
-            while(string.IsNullOrEmpty(newName = Console.ReadLine()))
+            if (selectedCategoryIndex != -1)
             {
+                string newName;
                 Console.Clear();
                 Console.WriteLine($"Enter the new name for category \"{categories.ToList()[selectedCategoryIndex].CatName}\"");
-                Console.WriteLine("Invalid input, please try again.");
-            }
-            var UpdatedCategory = new Category
-            {
-                CatName = newName,
-            };
+                while (string.IsNullOrEmpty(newName = Console.ReadLine()))
+                {
+                    Console.Clear();
+                    Console.WriteLine($"Enter the new name for category \"{categories.ToList()[selectedCategoryIndex].CatName}\"");
+                    Console.WriteLine("Invalid input, please try again.");
+                }
+                var UpdatedCategory = new Category
+                {
+                    CatName = newName,
+                };
 
-            adminAccess.UpdateCategory(UpdatedCategory, categories.ToList()[selectedCategoryIndex].CatName);
+                adminAccess.UpdateCategory(UpdatedCategory, categories.ToList()[selectedCategoryIndex].CatName);
+            }
         }
         private static void DeleteCategory()
         {
             var categories = adminAccess.ViewAllCategories();
             string header = "Select a category to delete:";
             int selectedCategoryIndex = ArrowKeySelection(categories.Select(c => c.CatName).ToList(), header);
-            adminAccess.DeleteCategory(categories.ToList()[selectedCategoryIndex].CatName);
+
+            if (selectedCategoryIndex == -1)
+            {
+                Console.WriteLine("Cancelling category removal.\nPress any key to continue...");
+                Console.ReadKey();
+            }
+            else
+            {
+                string headerConf = $"Confirm removal of category: {categories.ToList()[selectedCategoryIndex].CatName}? ";
+                string[] options = { "Yes", "No" };
+                int choice = ArrowKeySelection(options.ToList(), headerConf);
+
+                if (choice == 0)
+                {
+                    adminAccess.DeleteCategory(categories.ToList()[selectedCategoryIndex].CatName);
+                }
+                else
+                {
+                    Console.WriteLine("Cancelling category removal.\nPress any key to continue...");
+                    Console.ReadKey();
+                }
+            }
         }
     }
 }
