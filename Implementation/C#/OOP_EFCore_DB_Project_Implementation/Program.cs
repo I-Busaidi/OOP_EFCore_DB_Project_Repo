@@ -1811,6 +1811,8 @@ namespace OOP_EFCore_DB_Project_Implementation
                 sb.AppendLine($"{counter,-3} | {book.BookName,-30} | {book.AuthorName,-25} | {book.TotalCopies - book.BorrowedCopies}");
                 counter++;
             }
+            Console.Clear();
+            Console.WriteLine($"Books available in the category \"{selectedCategory.CatName}\":");
             Console.WriteLine($"{"No.",-3} | {"Book Name",-30} | {"Author Name",-25} | Available Copies");
             Console.WriteLine(border);
             Console.WriteLine(sb.ToString());
