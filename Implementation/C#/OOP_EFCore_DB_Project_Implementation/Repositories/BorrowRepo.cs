@@ -22,10 +22,12 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
             return _context.Borrows.ToList();
         }
 
-        public IEnumerable<Borrow> GetAllDetails()
+        public IEnumerable<Borrow> GetAllDetails(int pageNumber, int pageSize)
         {
             return _context.Borrows.Include(b => b.Book)
                                    .Include(u => u.User)
+                                   .Skip((pageNumber - 1) * pageSize)
+                                   .Take(pageSize)
                                    .ToList();
         }
 

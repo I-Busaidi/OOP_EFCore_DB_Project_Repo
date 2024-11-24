@@ -287,5 +287,10 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             return adminRepo.GetByName(name);
         }
+
+        public IEnumerable<Borrow> GetAllBorrows(int pageNumber, int pageSize)
+        {
+            return borrowRepo.GetAllDetails(pageNumber, pageSize);
+        }
     }
 }

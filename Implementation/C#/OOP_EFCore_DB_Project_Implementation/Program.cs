@@ -1819,5 +1819,58 @@ namespace OOP_EFCore_DB_Project_Implementation
             Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
+
+
+        //========== REPORTS ==========//
+        private static void ViewBorrowHistory()
+        {
+            int pageNumber = 1;
+            int pageSize = 10;
+            bool viewPages = true;
+            StringBuilder sb = new StringBuilder();
+            string border = new string('=', 90);
+            while (viewPages)
+            {
+                var borrows = adminAccess.GetAllBorrows(pageNumber, pageSize);
+
+                Console.Clear();
+                Console.WriteLine("Borrows History\n");
+                sb.Clear();
+                sb.AppendLine($"{"Book Name",-30} | {"Borrowed On",-30} | {"Due Date",-30} | {"Status (Returned)"}");
+                sb.AppendLine(border);
+
+                foreach (var borrow in borrows)
+                {
+                    sb.AppendLine($"{"",-30} | {"",-30} | {"",-30} | {""}");
+                    sb.AppendLine($"{borrow.Book.BookName,-30} | {borrow.BorrowDate,-30} | {borrow.ReturnDate,-30} | {borrow.IsReturned}");
+                }
+
+                Console.WriteLine(sb.ToString());
+                Console.WriteLine($"\nPage {pageNumber}");
+                Console.WriteLine("(<-) Left Arrow : Previous Page | (->) Right Arrow : Next Page | (Esc) Exit");
+
+                var key = Console.ReadKey(true).Key;
+
+                switch(key)
+                {
+                    case ConsoleKey.LeftArrow:
+                        if (pageNumber > 1)
+                        {
+                            pageNumber--;
+                        }
+                        break;
+
+                    case ConsoleKey.RightArrow:
+                        pageNumber++;
+                        break;
+
+                    case ConsoleKey.Escape:
+                        viewPages = false;
+                        break;
+
+                    default: break;
+                }
+            }
+        }
     }
 }
