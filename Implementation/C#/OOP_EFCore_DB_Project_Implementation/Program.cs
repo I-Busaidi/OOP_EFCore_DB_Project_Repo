@@ -78,8 +78,8 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             Console.Clear();
             Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
-            string password;
-            while (string.IsNullOrEmpty(password = Console.ReadLine()) || !Regex.IsMatch(password, passcodePattern))
+            string password = HidePassword();
+            while (string.IsNullOrEmpty(password) || !Regex.IsMatch(password, passcodePattern))
             {
                 if (!Regex.IsMatch(passcodePattern, password))
                 {
@@ -93,6 +93,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                     Console.WriteLine("Enter new password (8 characters, atleast 1 letter and 1 number):");
                     Console.WriteLine("Invalid password, please try again.");
                 }
+                password = HidePassword();
             }
 
             var admin = new Admin
