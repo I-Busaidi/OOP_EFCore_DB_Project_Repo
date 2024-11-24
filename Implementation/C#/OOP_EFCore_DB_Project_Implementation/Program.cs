@@ -712,9 +712,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Passcode = user.Passcode,
                 Gender = user.Gender,
             });
-            Console.WriteLine("Updated successfully.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+            
         }
         private static void EditUserEmail(User user)
         {
@@ -744,9 +742,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Passcode = user.Passcode,
                 Gender = user.Gender,
             });
-            Console.WriteLine("Updated successfully.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+            
         }
         private static void EditUserPasscode(User user)
         {
@@ -776,9 +772,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Passcode = password,
                 Gender = user.Gender,
             });
-            Console.WriteLine("Updated successfully.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+            
         }
         private static void DeleteUser(User user)
         {
@@ -1096,9 +1090,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 AdminFname = newFname,
                 AdminLname = newLname
             });
-            Console.WriteLine("Updated successfully.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+            
         }
         private static void EditAdminEmail(Admin admin)
         {
@@ -1127,9 +1119,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 AdminFname = admin.AdminFname,
                 AdminLname = admin.AdminLname
             });
-            Console.WriteLine("Updated successfully.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+          
         }
         private static void EditAdminPasscode(Admin admin)
         {
@@ -1158,9 +1148,6 @@ namespace OOP_EFCore_DB_Project_Implementation
                 AdminFname = admin.AdminFname,
                 AdminLname = admin.AdminLname
             });
-            Console.WriteLine("Updated successfully.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
         private static void ManageAdmin()
         {
@@ -1480,10 +1467,6 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = book.CopyPrice,
                 CatId = book.CatId,
             });
-
-            Console.WriteLine($"Book name changed from \"{book.BookName}\" to \"{bName}\" successfully.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
         private static void EditBookAuthorName(Book book)
         {
@@ -1508,10 +1491,6 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = book.CopyPrice,
                 CatId = book.CatId,
             });
-
-            Console.WriteLine($"Book author name changed from \"{book.AuthorName}\" to \"{newAuthorName}\" successfully.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
         private static void EditBookPrice(Book book)
         {
@@ -1542,10 +1521,6 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = newPrice,
                 CatId = book.CatId,
             });
-
-            Console.WriteLine($"\"{book.BookName}\" price has been changed from {book.CopyPrice} to {newPrice}");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
         private static void EditBorrowPeriod(Book book)
         {
@@ -1576,10 +1551,6 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = book.CopyPrice,
                 CatId = book.CatId,
             });
-
-            Console.WriteLine($"\"{book.BookName}\" allowed borrowing period has been changed from {book.BorrowPeriod} days to {newPeriod} days.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
         private static void AddCopies(Book book)
         {
@@ -1604,10 +1575,6 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = book.CopyPrice,
                 CatId = book.CatId,
             });
-
-            Console.WriteLine($"\"{book.BookName}\" available copies increased by {addedCopies}, total available copies: {addedCopies + book.TotalCopies}");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
         private static void DeleteBook(Book book)
         {
@@ -1773,7 +1740,9 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
                 var UpdatedCategory = new Category
                 {
+                    CatId = categories.ToList()[selectedCategoryIndex].CatId,
                     CatName = newName,
+                    NumOfBooks = categories.ToList()[selectedCategoryIndex].NumOfBooks
                 };
 
                 adminAccess.UpdateCategory(UpdatedCategory, categories.ToList()[selectedCategoryIndex].CatName);

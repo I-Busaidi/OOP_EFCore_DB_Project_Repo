@@ -35,6 +35,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (adminRepo.GetByEmail(admin.AdminEmail) == null)
             {
                 adminRepo.Insert(admin);
+                Console.WriteLine("Added successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
@@ -66,6 +69,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             else
             {
                 adminRepo.DeleteById(id);
+                Console.WriteLine("Removed successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -74,6 +80,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (adminRepo.GetByEmail(admin.AdminEmail) == null || adminRepo.GetById(admin.AdminId).AdminEmail == admin.AdminEmail)
             {
                 adminRepo.UpdateById(admin, admin.AdminId);
+                Console.WriteLine("Updated successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
@@ -99,6 +108,9 @@ namespace OOP_EFCore_DB_Project_Implementation
                     category.NumOfBooks++;
                     categoryRepo.UpdateByName(category, category.CatName);
                 }
+                Console.WriteLine("Added successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
@@ -113,6 +125,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (bookRepo.GetByName(book.BookName) == null || bookRepo.GetByName(book.BookName).BookId == book.BookId)
             {
                 bookRepo.UpdateByName(book, name);
+                Console.WriteLine("Updated successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
@@ -134,6 +149,9 @@ namespace OOP_EFCore_DB_Project_Implementation
                     category.NumOfBooks--;
                     categoryRepo.UpdateByName(category, category.CatName);
                 }
+                Console.WriteLine("Removed successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
@@ -146,13 +164,26 @@ namespace OOP_EFCore_DB_Project_Implementation
         public void AddCategory(Category category)
         {
             categoryRepo.Insert(category);
+            Console.WriteLine("Added successfully.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
 
         public void UpdateCategory(Category category, string catName)
         {
-            if (category != null)
+            var categoryCheck = categoryRepo.GetByName(catName);
+            if (categoryCheck == null || categoryCheck.CatId == category.CatId)
             {
                 categoryRepo.UpdateByName(category, catName);
+                Console.WriteLine("Updated successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+            }
+            else
+            {
+                Console.WriteLine("A category with this name already exists.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
 
@@ -162,6 +193,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (category != null && !category.Books.Any())
             {
                 categoryRepo.DeleteById(category.CatId);
+                Console.WriteLine("Removed successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
@@ -176,6 +210,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (userRepo.GetByEmail(user.Email) == null)
             {
                 userRepo.Insert(user);
+                Console.WriteLine("Added successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
@@ -191,6 +228,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (user != null && !user.Borrows.Any(b => !b.IsReturned))
             {
                 userRepo.DeleteById(uId);
+                Console.WriteLine("Removed successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
@@ -205,6 +245,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (userRepo.GetByEmail(user.Email) == null || userRepo.GetById(user.UserId).Email == user.Email)
             {
                 userRepo.UpdateById(user, user.UserId);
+                Console.WriteLine("Updated successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {

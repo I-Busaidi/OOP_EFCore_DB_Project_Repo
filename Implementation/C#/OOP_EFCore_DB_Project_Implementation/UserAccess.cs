@@ -28,6 +28,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (userRepo.GetByEmail(user.Email) == null)
             {
                 userRepo.Insert(user);
+                Console.WriteLine("Added successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
@@ -42,6 +45,9 @@ namespace OOP_EFCore_DB_Project_Implementation
             if (userRepo.GetByEmail(user.Email) == null || userRepo.GetById(user.UserId).Email == user.Email)
             {
                 userRepo.UpdateById(user, user.UserId);
+                Console.WriteLine("Updated successfully.");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
             else
             {
