@@ -437,6 +437,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                 }
                 info = Console.ReadKey(true);
             }
+            Console.WriteLine();
             return password;
         }
 
@@ -548,7 +549,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             else
             {
-                Console.WriteLine("Invalid credentials. Try again.");
+                Console.WriteLine("Invalid credentials.\nPress any key...");
                 Console.ReadLine();
             }
         }
@@ -624,11 +625,23 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             Console.Clear();
             var borrowedBooks = userAccess.GetCurrentBorrows(user.UserId);
-            foreach (var book in borrowedBooks)
+            if (!borrowedBooks.Any())
             {
-                Console.WriteLine($"{book.Book.BookName} by {book.Book.AuthorName}");
+                Console.WriteLine("User has no currently borrowed books.");
             }
-            Console.ReadLine();
+            else
+            {
+                int count = 1;
+                Console.WriteLine($"{"No.", -3} || {"Book Name", -30} || {"Author Name", -25} || {"Days Left"}");
+                string border = new string('=', 83);
+                Console.WriteLine(border);
+                foreach (var book in borrowedBooks)
+                {
+                    Console.WriteLine($"{count,-3} || {book.Book.BookName,-30} || {book.Book.AuthorName,-25} || {(book.ReturnDate - DateTime.Now).Days}");
+                }
+            }
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void EditUserInfo(User user)
         {
