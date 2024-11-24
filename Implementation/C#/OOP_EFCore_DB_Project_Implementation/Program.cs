@@ -712,6 +712,9 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Passcode = user.Passcode,
                 Gender = user.Gender,
             });
+            Console.WriteLine("Updated successfully.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void EditUserEmail(User user)
         {
@@ -741,6 +744,9 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Passcode = user.Passcode,
                 Gender = user.Gender,
             });
+            Console.WriteLine("Updated successfully.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void EditUserPasscode(User user)
         {
@@ -770,6 +776,9 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Passcode = password,
                 Gender = user.Gender,
             });
+            Console.WriteLine("Updated successfully.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void DeleteUser(User user)
         {
@@ -1087,6 +1096,9 @@ namespace OOP_EFCore_DB_Project_Implementation
                 AdminFname = newFname,
                 AdminLname = newLname
             });
+            Console.WriteLine("Updated successfully.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void EditAdminEmail(Admin admin)
         {
@@ -1115,6 +1127,9 @@ namespace OOP_EFCore_DB_Project_Implementation
                 AdminFname = admin.AdminFname,
                 AdminLname = admin.AdminLname
             });
+            Console.WriteLine("Updated successfully.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void EditAdminPasscode(Admin admin)
         {
@@ -1143,6 +1158,9 @@ namespace OOP_EFCore_DB_Project_Implementation
                 AdminFname = admin.AdminFname,
                 AdminLname = admin.AdminLname
             });
+            Console.WriteLine("Updated successfully.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void ManageAdmin()
         {
@@ -1442,17 +1460,18 @@ namespace OOP_EFCore_DB_Project_Implementation
         private static void EditBookName(Book book)
         {
             Console.Clear();
-            Console.WriteLine("Enter the new name for the book: ");
+            Console.WriteLine($"Enter the new name for the book \"{book.BookName}\": ");
             string bName;
             while(string.IsNullOrEmpty(bName = Console.ReadLine()))
             {
                 Console.Clear();
-                Console.WriteLine("Enter the new name for the book: ");
+                Console.WriteLine($"Enter the new name for the book \"{book.BookName}\": ");
                 Console.WriteLine("Invalid input, please try again.");
             }
 
             adminAccess.UpdateBook(book.BookName, new Book
             {
+                BookId = book.BookId,
                 BookName = bName,
                 AuthorName = book.AuthorName,
                 BorrowedCopies = book.BorrowedCopies,
@@ -1461,11 +1480,15 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = book.CopyPrice,
                 CatId = book.CatId,
             });
+
+            Console.WriteLine($"Book name changed from \"{book.BookName}\" to \"{bName}\" successfully.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void EditBookAuthorName(Book book)
         {
             Console.Clear();
-            Console.WriteLine("Enter the new author name for the book: ");
+            Console.WriteLine($"Enter the new author name for the book \"{book.BookName}\": ");
             string newAuthorName;
             while (string.IsNullOrEmpty(newAuthorName = Console.ReadLine()))
             {
@@ -1476,6 +1499,7 @@ namespace OOP_EFCore_DB_Project_Implementation
 
             adminAccess.UpdateBook(book.BookName, new Book
             {
+                BookId = book.BookId,
                 BookName = book.BookName,
                 AuthorName = newAuthorName,
                 BorrowedCopies = book.BorrowedCopies,
@@ -1484,16 +1508,20 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = book.CopyPrice,
                 CatId = book.CatId,
             });
+
+            Console.WriteLine($"Book author name changed from \"{book.AuthorName}\" to \"{newAuthorName}\" successfully.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void EditBookPrice(Book book)
         {
             Console.Clear();
-            Console.WriteLine("Enter the new price for the book: ");
+            Console.WriteLine($"Enter the new price for the book \"{book.BookName}\": ");
             decimal newPrice;
             while (!decimal.TryParse(Console.ReadLine(), out newPrice) || newPrice <= 0)
             {
                 Console.Clear();
-                Console.WriteLine("Enter the new price for the book: ");
+                Console.WriteLine($"Enter the new price for the book \"{book.BookName}\": ");
                 if (newPrice <= 0)
                 {
                     Console.WriteLine("Price must be greater than 0");
@@ -1505,6 +1533,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             adminAccess.UpdateBook(book.BookName, new Book
             {
+                BookId = book.BookId,
                 BookName = book.BookName,
                 AuthorName = book.AuthorName,
                 BorrowedCopies = book.BorrowedCopies,
@@ -1513,16 +1542,20 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = newPrice,
                 CatId = book.CatId,
             });
+
+            Console.WriteLine($"\"{book.BookName}\" price has been changed from {book.CopyPrice} to {newPrice}");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void EditBorrowPeriod(Book book)
         {
             Console.Clear();
-            Console.WriteLine("Enter the new allowed borrow period for the book: ");
+            Console.WriteLine($"Enter the new allowed borrow period for the book \"{book.BookName}\": ");
             int newPeriod;
             while (!int.TryParse(Console.ReadLine(), out newPeriod) || newPeriod <= 0)
             {
                 Console.Clear();
-                Console.WriteLine("Enter the new allowed borrow period for the book: ");
+                Console.WriteLine($"Enter the new allowed borrow period for the book \"{book.BookName}\": ");
                 if (newPeriod <= 0)
                 {
                     Console.WriteLine("Allowed borrow period must be greater than 0");
@@ -1534,6 +1567,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             adminAccess.UpdateBook(book.BookName, new Book
             {
+                BookId = book.BookId,
                 BookName = book.BookName,
                 AuthorName = book.AuthorName,
                 BorrowedCopies = book.BorrowedCopies,
@@ -1542,21 +1576,26 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = book.CopyPrice,
                 CatId = book.CatId,
             });
+
+            Console.WriteLine($"\"{book.BookName}\" allowed borrowing period has been changed from {book.BorrowPeriod} days to {newPeriod} days.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void AddCopies(Book book)
         {
             Console.Clear();
-            Console.WriteLine("Enter the number of copies to add for the book: ");
+            Console.WriteLine($"Enter the number of copies to add for the book \"{book.BookName}\": ");
             int addedCopies;
             while (!int.TryParse(Console.ReadLine(), out addedCopies) || addedCopies < 0)
             {
                 Console.Clear();
-                Console.WriteLine("Enter the number of copies to add for the book: ");
+                Console.WriteLine($"Enter the number of copies to add for the book \"{book.BookName}\": ");
                 Console.WriteLine("Invalid input, please try again.");
             }
 
             adminAccess.UpdateBook(book.BookName, new Book
             {
+                BookId = book.BookId,
                 BookName = book.BookName,
                 AuthorName = book.AuthorName,
                 BorrowedCopies = book.BorrowedCopies,
@@ -1565,6 +1604,10 @@ namespace OOP_EFCore_DB_Project_Implementation
                 CopyPrice = book.CopyPrice,
                 CatId = book.CatId,
             });
+
+            Console.WriteLine($"\"{book.BookName}\" available copies increased by {addedCopies}, total available copies: {addedCopies + book.TotalCopies}");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
         private static void DeleteBook(Book book)
         {
