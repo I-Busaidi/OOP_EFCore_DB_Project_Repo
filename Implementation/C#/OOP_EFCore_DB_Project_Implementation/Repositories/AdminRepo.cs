@@ -21,7 +21,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         }
         public IEnumerable<Admin> GetByName(string name)
         {
-            return _context.Admins.Where(a => a.AdminFname.Contains(name) || a.AdminLname.Contains(name));
+            return _context.Admins.Where(a => a.AdminFname.Contains(name) || a.AdminLname.Contains(name) || name.Contains(a.AdminFname) || name.Contains(a.AdminLname));
         }
 
         public Admin GetByEmail(string email)

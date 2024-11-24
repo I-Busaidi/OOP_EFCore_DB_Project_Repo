@@ -509,35 +509,67 @@ namespace OOP_EFCore_DB_Project_Implementation
         }
         private static void ShowUserMenu(User user)
         {
-            int choice = -1;
-            string header = "User Menu:";
-            string[] options = { "Browse Books", "Search for Books", "View Borrowed Books", "Edit User Info", "Logout" };
-            do
+            var userBorrows = userAccess.GetCurrentBorrows(user.UserId);
+            if (userBorrows.Any(b => b.ReturnDate < DateTime.Now && b.IsReturned == false))
             {
-                choice = ArrowKeySelection(options.ToList(), header);
-                if (choice == 0)
+                int choice = -1;
+                string header = "User Menu (! Must return overdue books before accessing other services !):";
+                string[] options = {"Return Book", "Edit User Info", "Logout" };
+                do
                 {
-                    BrowseBooks();
+                    choice = ArrowKeySelection(options.ToList(), header);
+                    if (choice == 0)
+                    {
+                        ReturnBook(user);
+                    }
+                    else if (choice == 1)
+                    {
+                        EditUserInfo(user);
+                    }
+                    else if (choice == 2)
+                    {
+                        Logout();
+                        return;
+                    }
                 }
-                else if (choice == 1)
-                {
-                    SearchBooks();
-                }
-                else if (choice == 2)
-                {
-                    ViewBorrowedBooks(user);
-                }
-                else if (choice == 3)
-                {
-                    EditUserInfo(user);
-                }
-                else if (choice == 4)
-                {
-                    Logout();
-                    return;
-                }
+                while (choice != 2);
             }
-            while (choice != 4);
+            else
+            {
+                int choice = -1;
+                string header = "User Menu:";
+                string[] options = { "Browse Books", "Search for Books", "View Borrowed Books", "Return Book", "Edit User Info", "Logout" };
+                do
+                {
+                    choice = ArrowKeySelection(options.ToList(), header);
+                    if (choice == 0)
+                    {
+                        BrowseBooks();
+                    }
+                    else if (choice == 1)
+                    {
+                        SearchBooks();
+                    }
+                    else if (choice == 2)
+                    {
+                        ViewBorrowedBooks(user);
+                    }
+                    else if (choice == 3)
+                    {
+                        ReturnBook(user);
+                    }
+                    else if (choice == 4)
+                    {
+                        EditUserInfo(user);
+                    }
+                    else if(choice == 5)
+                    {
+                        Logout();
+                        return;
+                    }
+                }
+                while (choice != 5);
+            }
         }
         private static void ViewBorrowedBooks(User user)
         {
@@ -551,8 +583,8 @@ namespace OOP_EFCore_DB_Project_Implementation
         }
         private static void EditUserInfo(User user)
         {
-            string header = "Select an editing option: ";
-            string[] options = {"Edit Name","Edit Email","Edit Password","Exit"};
+            string header = $"Select an editing option for {user.FName + " " + user.LName}: ";
+            string[] options = {"Edit Name","Edit Email","Edit Password", "Remove User","Exit"};
             int choice = -1;
 
             do
@@ -573,13 +605,17 @@ namespace OOP_EFCore_DB_Project_Implementation
                         break;
 
                     case 3:
+                        DeleteUser(user);
+                        break;
+
+                    case 4:
                         break;
 
                     default:
                         break;
                 }
             }
-            while (choice != 3);
+            while (choice != 4);
 
         }
         private static void EditUserName(User user)
@@ -686,6 +722,35 @@ namespace OOP_EFCore_DB_Project_Implementation
                 Console.WriteLine("User removal has been cancelled.");
             }
         }
+        private static void ManageUser()
+        {
+            string searchTerm;
+            Console.Clear();
+            Console.WriteLine("Enter the user name to manage: ");
+            while(string.IsNullOrEmpty(searchTerm = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the user name to manage: ");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            var usersList = adminAccess.GetUsersByName(searchTerm).ToList();
+            if (usersList.Count() == 0)
+            {
+                Console.WriteLine("No user with this name found");
+            }
+            else if (usersList.Count() == 1)
+            {
+                EditUserInfo(usersList[0]);
+            }
+            else
+            {
+                string header = "Select a user from the list that matched the name: ";
+                int selectedIndex = ArrowKeySelection(usersList.Select(u => $"{u.FName + " " + u.LName, -30} | Email: {u.Email}").ToList(), header);
+                var selectedUser = usersList[selectedIndex];
+                EditUserInfo(selectedUser);
+            }
+        }
 
 
         //========== ADMIN RELATED OPERATIONS ==========//
@@ -783,7 +848,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             int choice = -1;
             string header = "Admin Menu:";
-            string[] options = { "Add Book", "View All Books", "View Users", "Manage Categories", "Search for Books", "Logout" };
+            string[] options = { "Add Book", "View All Books", "View Users", "Manage Categories", "Search for Books", "Manage Users", "Manage Books", "Logout" };
 
             do
             {
@@ -808,7 +873,15 @@ namespace OOP_EFCore_DB_Project_Implementation
                 {
                     SearchBooks();
                 }
-                else if (choice == 5)
+                else if(choice == 5)
+                {
+                    ManageUser();
+                }
+                else if(choice == 6)
+                {
+                    ManageBook();
+                }
+                else if (choice == 7)
                 {
                     Logout();
                     return;
@@ -820,7 +893,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             int choice = -1;
             string header = "Master Admin Menu:";
-            string[] options = { "Add Book", "View All Books", "View Users", "Manage Categories", "Search for Books", "Logout" };
+            string[] options = { "Add Book", "View All Books", "View Users", "Manage Categories", "Search for Books", "Manage Users", "Manage Admins", "Manage Books", "Logout" };
 
             do
             {
@@ -845,7 +918,19 @@ namespace OOP_EFCore_DB_Project_Implementation
                 {
                     SearchBooks();
                 }
-                else if (choice == 5)
+                else if(choice == 5)
+                {
+                    ManageUser();
+                }
+                else if(choice == 6)
+                {
+                    ManageAdmin();
+                }
+                else if( choice == 7)
+                {
+                    ManageBook();
+                }
+                else if (choice == 8)
                 {
                     Logout();
                     return;
@@ -871,7 +956,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         private static void EditAdminInfo(Admin admin)
         {
             string header = "Select an editing option: ";
-            string[] options = { "Edit Name", "Edit Email", "Edit Password", "Exit" };
+            string[] options = { "Edit Name", "Edit Email", "Edit Password", "Remove Admin", "Exit" };
             int choice = -1;
 
             do
@@ -892,13 +977,17 @@ namespace OOP_EFCore_DB_Project_Implementation
                         break;
 
                     case 3:
+                        DeleteAdmin(admin);
+                        break;
+
+                    case 4:
                         break;
 
                     default:
                         break;
                 }
             }
-            while (choice != 3);
+            while (choice != 4);
         }
         private static void EditAdminName(Admin admin)
         {
@@ -985,6 +1074,35 @@ namespace OOP_EFCore_DB_Project_Implementation
                 AdminFname = admin.AdminFname,
                 AdminLname = admin.AdminLname
             });
+        }
+        private static void ManageAdmin()
+        {
+            string searchTerm;
+            Console.Clear();
+            Console.WriteLine("Enter the admin name to manage: ");
+            while (string.IsNullOrEmpty(searchTerm = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the admin name to manage: ");
+                Console.WriteLine("Invalid input, please try again.");
+            }
+
+            var adminsList = adminAccess.GetAdminsByName(searchTerm).ToList();
+            if (adminsList.Count() == 0)
+            {
+                Console.WriteLine("No admin with this name found");
+            }
+            else if (adminsList.Count() == 1)
+            {
+                EditAdminInfo(adminsList[0]);
+            }
+            else
+            {
+                string header = "Select an admin from the list that matched the name: ";
+                int selectedIndex = ArrowKeySelection(adminsList.Select(a => $"{a.AdminFname + " " + a.AdminLname,-30} | Email: {a.AdminEmail}").ToList(), header);
+                var selectedAdmin = adminsList[selectedIndex];
+                EditAdminInfo(selectedAdmin);
+            }
         }
 
 
@@ -1138,7 +1256,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         private static void EditBookInfo(Book book)
         {
             string header = "Select an editing option: ";
-            string[] options = { "Edit Name", "Edit Author Name", "Edit Price", "Edit Borrow Period", "Add Copies", "Exit" };
+            string[] options = { "Edit Name", "Edit Author Name", "Edit Price", "Edit Borrow Period", "Add Copies", "Remove Book", "Exit" };
             int choice = -1;
 
             do
@@ -1167,13 +1285,17 @@ namespace OOP_EFCore_DB_Project_Implementation
                         break;
 
                     case 5:
+                        DeleteBook(book);
+                        break;
+
+                    case 6:
                         break;
 
                     default:
                         break;
                 }
             }
-            while (choice != 5);
+            while (choice != 6);
         }
         private static void EditBookName(Book book)
         {
@@ -1326,7 +1448,41 @@ namespace OOP_EFCore_DB_Project_Implementation
             }
             else
             {
+                var borrowsList = borrows.ToList();
+                string header = "Select a book to return: ";
+                int selectedIndex = ArrowKeySelection(borrowsList.Select(b => $"{b.Book.BookName, -30} | Due Date: {b.ReturnDate, -30} | Days left: {(b.ReturnDate - DateTime.Now).Days}").ToList(), header);
+                var selectedBorrow = borrowsList[selectedIndex];
+                userAccess.ReturnBook(user.UserId, selectedBorrow.BookId);
+                ShowRecommendations(selectedBorrow.Book);
+            }
+        }
+        private static void ManageBook()
+        {
+            string searchTerm;
+            Console.Clear();
+            Console.WriteLine("Enter the book or author name to manage book(s): ");
+            while (string.IsNullOrEmpty(searchTerm = Console.ReadLine()))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter the book or author name to manage book(s): ");
+                Console.WriteLine("Invalid input, please try again.");
+            }
 
+            var booksList = userAccess.SearchBooks(searchTerm).ToList();
+            if (booksList.Count() == 0)
+            {
+                Console.WriteLine("No book or author with this name found");
+            }
+            else if (booksList.Count() == 1)
+            {
+                EditBookInfo(booksList[0]);
+            }
+            else
+            {
+                string header = "Select a book from the list that matched the name: ";
+                int selectedIndex = ArrowKeySelection(booksList.Select(b => $"{b.BookName,-30} | By: {b.AuthorName}").ToList(), header);
+                var selectedBook = booksList[selectedIndex];
+                EditBookInfo(selectedBook);
             }
         }
 

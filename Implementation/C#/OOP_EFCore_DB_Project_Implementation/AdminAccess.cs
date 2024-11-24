@@ -199,5 +199,15 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             borrowRepo.Insert(borrow);
         }
+
+        public IEnumerable<User> GetUsersByName(string name)
+        {
+            return userRepo.GetByName(name);
+        }
+
+        public IEnumerable<Admin> GetAdminsByName(string name)
+        {
+            return adminRepo.GetByName(name);
+        }
     }
 }

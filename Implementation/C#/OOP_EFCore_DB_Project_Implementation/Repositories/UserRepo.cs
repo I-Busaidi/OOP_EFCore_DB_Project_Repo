@@ -23,7 +23,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
 
         public IEnumerable<User> GetByName(string name)
         {
-            return _context.Users.Where( u => u.FName.Contains(name) || u.LName.Contains(name));
+            return _context.Users.Where( u => u.FName.Contains(name) || u.LName.Contains(name) || name.Contains(u.FName) || name.Contains(u.LName));
         }
 
         public User GetByEmail(string email)
