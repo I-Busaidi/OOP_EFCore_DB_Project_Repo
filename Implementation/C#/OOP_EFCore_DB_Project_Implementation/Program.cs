@@ -364,7 +364,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             {
                 AddUser();
             }
-            else if (choice == 3)
+            else
             {
                 return;
             }
@@ -521,67 +521,71 @@ namespace OOP_EFCore_DB_Project_Implementation
         }
         private static void ShowUserMenu(User user)
         {
+            string header;
+            int choice;
+            string[] options;
+            bool borrowPending = true;
             var userBorrows = userAccess.GetCurrentBorrows(user.UserId);
             if (userBorrows.Any(b => b.ReturnDate < DateTime.Now && b.IsReturned == false))
             {
-                int choice = -1;
-                string header = "User Menu (! Must return overdue books before accessing other services !):";
-                string[] options = {"Return Book", "Edit User Info", "Logout" };
                 do
                 {
+                    choice = -1;
+                    header = "User Menu (! Must return overdue books before accessing other services !):";
+                    options = new string[] { "Return Book", "Edit User Info", "Logout" };
                     choice = ArrowKeySelection(options.ToList(), header);
                     if (choice == 0)
                     {
                         ReturnBook(user);
+                        var userBorrow = userAccess.GetCurrentBorrows(user.UserId);
+                        if (!userBorrows.Any(b => b.ReturnDate < DateTime.Now && b.IsReturned == false))
+                        {
+                            borrowPending = false;
+                        }
                     }
                     else if (choice == 1)
                     {
                         EditUserInfo(user);
                     }
-                    else if (choice == 2)
+                    else
                     {
                         Logout();
-                        return;
                     }
                 }
-                while (choice != 2);
+                while (borrowPending);
             }
-            else
+            choice = -1;
+            header = "User Menu:";
+            options = new string[] { "Browse Books", "Search for Books", "View Borrowed Books", "Return Book", "Edit User Info", "Logout" };
+            do
             {
-                int choice = -1;
-                string header = "User Menu:";
-                string[] options = { "Browse Books", "Search for Books", "View Borrowed Books", "Return Book", "Edit User Info", "Logout" };
-                do
+                choice = ArrowKeySelection(options.ToList(), header);
+                if (choice == 0)
                 {
-                    choice = ArrowKeySelection(options.ToList(), header);
-                    if (choice == 0)
-                    {
-                        BrowseBooks();
-                    }
-                    else if (choice == 1)
-                    {
-                        SearchBooks();
-                    }
-                    else if (choice == 2)
-                    {
-                        ViewBorrowedBooks(user);
-                    }
-                    else if (choice == 3)
-                    {
-                        ReturnBook(user);
-                    }
-                    else if (choice == 4)
-                    {
-                        EditUserInfo(user);
-                    }
-                    else if(choice == 5)
-                    {
-                        Logout();
-                        return;
-                    }
+                    BrowseBooks();
                 }
-                while (choice != 5);
+                else if (choice == 1)
+                {
+                    SearchBooks();
+                }
+                else if (choice == 2)
+                {
+                    ViewBorrowedBooks(user);
+                }
+                else if (choice == 3)
+                {
+                    ReturnBook(user);
+                }
+                else if (choice == 4)
+                {
+                    EditUserInfo(user);
+                }
+                else if (choice == 5)
+                {
+                    Logout();
+                }
             }
+            while (choice != 5);
         }
         private static void ViewBorrowedBooks(User user)
         {
@@ -621,6 +625,8 @@ namespace OOP_EFCore_DB_Project_Implementation
                         break;
 
                     case 4:
+                    case -1:
+                        choice = 4;
                         break;
 
                     default:
@@ -759,11 +765,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             {
                 string header = "Select a user from the list that matched the name: ";
                 int selectedIndex = ArrowKeySelection(usersList.Select(u => $"{u.FName + " " + u.LName, -30} | Email: {u.Email}").ToList(), header);
-                if (selectedIndex == -1)
-                {
-                    return;
-                }
-                else
+                if (selectedIndex != -1)
                 {
                     var selectedUser = usersList[selectedIndex];
                     EditUserInfo(selectedUser);
@@ -903,7 +905,6 @@ namespace OOP_EFCore_DB_Project_Implementation
                 else
                 {
                     Logout();
-                    return;
                 }
             }
             while (choice != 5);
@@ -955,7 +956,7 @@ namespace OOP_EFCore_DB_Project_Implementation
                     return;
                 }
             }
-            while (choice != 5);
+            while (choice != 8 || choice != -1);
         }
         private static void DeleteAdmin(Admin admin)
         {
@@ -1484,9 +1485,11 @@ namespace OOP_EFCore_DB_Project_Implementation
         private static void ReturnBook(User user)
         {
             var borrows = userAccess.GetCurrentBorrows(user.UserId);
-            if (borrows == null)
+            if (!borrows.Any())
             {
-                Console.WriteLine("No books currently borrowed by this user.");
+                Console.Clear() ;
+                Console.WriteLine("No books currently borrowed by this user.\nPress any key to continue...");
+                Console.ReadKey();
             }
             else
             {
