@@ -1838,7 +1838,7 @@ namespace OOP_EFCore_DB_Project_Implementation
             int pageSize = 10;
             bool viewPages = true;
             StringBuilder sb = new StringBuilder();
-            string border = new string('=', 90);
+            string border = new string('=', 117);
             while (viewPages)
             {
                 var borrows = adminAccess.GetAllBorrows(pageNumber, pageSize);
