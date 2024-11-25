@@ -17,7 +17,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         }
         public IEnumerable<Category> GetAll()
         {
-            return _context.Categories.ToList();
+            return _context.Categories.Include(c => c.Books).ToList();
         }
         public Category GetByName(string name)
         {

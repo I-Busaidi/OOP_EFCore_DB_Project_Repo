@@ -59,7 +59,7 @@ namespace OOP_EFCore_DB_Project_Implementation
 
         public void RemoveAdmin(int id)
         {
-            var mAdmins = adminRepo.GetAll().Where(a => a.MasterAdminId ==null).ToList();
+            var mAdmins = adminRepo.GetAll().Where(a => a.MasterAdminId == null).ToList();
             if (mAdmins.Count == 1)
             {
                 Console.WriteLine("Cannot remove the last remaining master admin.");
@@ -291,6 +291,55 @@ namespace OOP_EFCore_DB_Project_Implementation
         public IEnumerable<Borrow> GetAllBorrows(int pageNumber, int pageSize)
         {
             return borrowRepo.GetAllDetails(pageNumber, pageSize);
+        }
+
+        public IEnumerable<(Book book, double avgRating)> GetBooksRating()
+        {
+            var books = bookRepo.GetAll();
+            var ratedBooks = books.Select(book =>
+            {
+                var bookBorrows = borrowRepo.GetBookBorrowsById(book.BookId);
+                var averageRating = bookBorrows.Any() ? bookBorrows.Average(b => b.Rating ?? 0) : 0;
+                return (book, averageRating);
+            });
+            return ratedBooks;
+        }
+        public IEnumerable<(string CategoryName, int BookCount, decimal TotalCost)> GetBooksCountAndCostPerCategory()
+        {
+            var categories = categoryRepo.GetAll();
+            if (categories == null)
+            {
+                return Enumerable.Empty<(string, int, decimal)>();
+            }
+
+            var result = categories.Select(category =>
+            {
+                var bookCount = category.Books?.Count ?? 0;
+                var totalCost = category.Books?.Sum(book => book.CopyPrice * book.TotalCopies) ?? 0m;
+                return (CategoryName: category.CatName, BookCount: bookCount, TotalCost: totalCost);
+            });
+
+            return result;
+        }
+
+        public decimal GetTotalLibraryCost()
+        {
+            return bookRepo.GetTotalPrice();
+        }
+
+        public int GetUserCountByGender(string gender)
+        {
+            return userRepo.CountByGender(gender);
+        }
+
+        public int GetTotalBorrowedBooks()
+        {
+            return borrowRepo.GetCurrentBorrowedBooks();
+        }
+
+        public decimal GetMaxBookPrice()
+        {
+            return bookRepo.GetMaxPrice();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using OOP_EFCore_DB_Project_Implementation.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using OOP_EFCore_DB_Project_Implementation.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +76,7 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         }
         public decimal GetTotalPrice()
         {
-            return _context.Books.Sum(book => book.CopyPrice);
+            return _context.Books.Sum(book => book.CopyPrice * book.TotalCopies);
         }
         public decimal GetMaxPrice()
         {
@@ -93,6 +94,11 @@ namespace OOP_EFCore_DB_Project_Implementation.Repositories
         public bool IsBookBorrowed(int id)
         {
             return _context.Borrows.Any(b => b.BookId == id && !b.IsReturned);
+        }
+
+        public IEnumerable<Book> GetBooksWithBorrows()
+        {
+            return _context.Books.Include(b => b.Borrows);
         }
     }
 }

@@ -923,7 +923,7 @@ namespace OOP_EFCore_DB_Project_Implementation
         {
             int choice = -1;
             string header = "Admin Menu:";
-            string[] options = { "Add Book", "View All Books", "View Books By Category", "View Users", "Manage Categories", "Search for Books", "Manage Users", "Manage Books", "Logout" };
+            string[] options = { "Add Book", "View All Books", "View Books By Category", "View Users", "Manage Categories", "Search for Books", "Manage Users", "Manage Books", "Library Reports", "Logout" };
 
             do
             {
@@ -960,18 +960,24 @@ namespace OOP_EFCore_DB_Project_Implementation
                 {
                     ManageBook();
                 }
+                else if(choice == 8)
+                {
+                    ShowLibraryStats();
+                }
                 else
                 {
                     Logout();
                 }
             }
-            while (choice != 8 || choice != -1);
+            while (choice != 9 || choice != -1);
         }
         private static void ShowMasterAdminMenu(Admin admin)
         {
             int choice = -1;
             string header = "Master Admin Menu:";
-            string[] options = { "Add Book", "View All Books", "View Books By Category", "View Users", "Manage Categories", "Search for Books", "Manage Users", "Manage Admins", "Manage Books", "Logout" };
+            string[] options = { "Add Book", "View All Books", "View Books By Category", 
+                "View Users", "Manage Categories", "Search for Books", "Manage Users", 
+                "Manage Admins", "Manage Books", "Library Reports", "Logout" };
 
             do
             {
@@ -1012,13 +1018,17 @@ namespace OOP_EFCore_DB_Project_Implementation
                 {
                     ManageBook();
                 }
+                else if (choice == 9)
+                {
+                    ShowLibraryStats();
+                }
                 else
                 {
                     Logout();
                     return;
                 }
             }
-            while (choice != 9 || choice != -1);
+            while (choice != 10 || choice != -1);
         }
         private static void DeleteAdmin(Admin admin)
         {
@@ -1871,6 +1881,101 @@ namespace OOP_EFCore_DB_Project_Implementation
                     default: break;
                 }
             }
+        }
+        private static void ViewBooksRating()
+        {
+            var ratedBooks = adminAccess.GetBooksRating();
+            string border = new string('-', 68);
+            Console.WriteLine("Books and their average rating:");
+            Console.WriteLine($"{"Book Name", -30} | {"Author", -25} | {"Rating", -10}");
+            
+            foreach (var (book, avgRating) in ratedBooks)
+            {
+                Console.WriteLine(border);
+                Console.WriteLine($"{book.BookName, -30} | {book.AuthorName, -25} | {avgRating:F2}");
+            }
+        }
+        private static void ShowBooksCountAndCostPerCategory() 
+        {
+            var booksCountAndCostPerCategory = adminAccess.GetBooksCountAndCostPerCategory();
+            Console.WriteLine("Number of Books Per Category:");
+            string border = new string('-', 60);
+            Console.WriteLine($"{"Category", -25} | {"Books", -7} | {"Total Cost", -15}");
+            foreach (var (CategoryName, BookCount, TotalCost) in booksCountAndCostPerCategory) 
+            { 
+                Console.WriteLine(border);
+                Console.WriteLine($"{CategoryName, -25} | {BookCount, -7} | {TotalCost:C2}");
+            } 
+        }
+        private static void ShowTotalLibraryCost()
+        {
+            decimal totalCost = adminAccess.GetTotalLibraryCost();
+            Console.WriteLine($"Total cost of all books in the library: {totalCost:C2}");
+        }
+        private static void ShowLibraryUsersGenderCount()
+        {
+            int femaleUsersCount = adminAccess.GetUserCountByGender("Female");
+            int maleUsersCount = adminAccess.GetUserCountByGender("Male");
+
+            Console.WriteLine("Library users count based on gender:");
+            Console.WriteLine($"\nMale: {maleUsersCount} | Female: {femaleUsersCount}");
+        }
+        private static void ShowTotalBorrowedBooks()
+        {
+            int borrowedBooksCount = adminAccess.GetTotalBorrowedBooks();
+            Console.WriteLine($"Total number of currently borrowed books: {borrowedBooksCount}");
+        }
+        private static void ShowMaxBookPrice()
+        {
+            decimal maxPrice = adminAccess.GetMaxBookPrice();
+            Console.WriteLine($"Maximum book price available in the library: {maxPrice}");
+        }
+        private static void ShowLibraryStats()
+        {
+            int choice = -1;
+            string header = "Select an option:";
+            string[] options = { "View Borrows History", "View Books Ratings", "Financial Report", "Show Library Statistics", "Exit"};
+
+            do
+            {
+                
+                choice = ArrowKeySelection(options.ToList(), header);
+                Console.Clear();
+                switch (choice)
+                {
+                    case 0:
+                        ViewBorrowHistory();
+                        break;
+
+                    case 1:
+                        ViewBooksRating();
+                        break;
+
+                    case 2:
+                        ShowBooksCountAndCostPerCategory();
+                        Console.WriteLine("\n");
+                        ShowTotalLibraryCost();
+                        break;
+
+                    case 3:
+                        ShowLibraryUsersGenderCount();
+                        Console.WriteLine("\n");
+                        ShowTotalBorrowedBooks();
+                        Console.WriteLine("\n");
+                        ShowMaxBookPrice();
+                        break;
+
+                    case 4:
+                    case -1:
+                        choice = 4;
+                        break;
+                    default:
+                        break;
+                }
+                Console.WriteLine("\n\nPress any key to continue...");
+                Console.ReadKey();
+            }
+            while (choice != 4);
         }
     }
 }
